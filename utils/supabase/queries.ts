@@ -37,3 +37,17 @@ export const getUserDetails = cache(async (supabase: SupabaseClient) => {
     .single();
   return userDetails;
 });
+
+export const getBusinesses = cache(async (supabase: SupabaseClient) => {
+  const { data: businesses, error } = await supabase
+    .from('businesses')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching businesses:', error);
+    return [];
+  }
+
+  return businesses || [];
+});
