@@ -51,3 +51,89 @@ export const getBusinesses = cache(async (supabase: SupabaseClient) => {
 
   return businesses || [];
 });
+
+export const getBusiness = cache(async (supabase: SupabaseClient, businessId: string) => {
+  const { data: business, error } = await supabase
+    .from('businesses')
+    .select('*')
+    .eq('id', businessId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching business:', error);
+    return null;
+  }
+
+  return business;
+});
+
+export const getLinesByBusiness = cache(async (supabase: SupabaseClient, businessId: string) => {
+  const { data: lines, error } = await supabase
+    .from('lines')
+    .select('*')
+    .eq('business_id', businessId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching lines:', error);
+    return [];
+  }
+
+  return lines || [];
+});
+
+export const getLineById = cache(async (supabase: SupabaseClient, lineId: string) => {
+  const { data: line, error } = await supabase
+    .from('lines')
+    .select('*')
+    .eq('id', lineId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching line:', error);
+    return null;
+  }
+
+  return line;
+});
+
+export const getPositionsByLine = cache(async (supabase: SupabaseClient, lineId: string) => {
+  const { data: positions, error } = await supabase
+    .from('positions')
+    .select('*')
+    .eq('line_id', lineId)
+    .order('position', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching positions:', error);
+    return [];
+  }
+
+  return positions || [];
+});
+
+export const getLineWithPositions = cache(async (supabase: SupabaseClient, lineId: string) => {
+  const { data: line, error: lineError } = await supabase
+    .from('lines')
+    .select('*')
+    .eq('id', lineId)
+    .single();
+
+  if (lineError || !line) {
+    console.error('Error fetching line:', lineError);
+    return null;
+  }
+
+  const { data: positions, error: positionsError } = await supabase
+    .from('positions')
+    .select('*')
+    .eq('line_id', lineId)
+    .order('position', { ascending: true });
+
+  if (positionsError) {
+    console.error('Error fetching positions:', positionsError);
+    return { ...line, positions: [] };
+  }
+
+  return { ...line, positions: positions || [] };
+});

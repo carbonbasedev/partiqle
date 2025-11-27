@@ -7,7 +7,7 @@ import {
   getViewTypes,
   getDefaultSignInView,
   getRedirectMethod
-} from '@/utils/auth-helpers/settings';
+} from '@/utils/supabase/auth-helpers/settings';
 import Card from '@/components/ui/Card';
 import PasswordSignIn from '@/components/ui/AuthForms/PasswordSignIn';
 import EmailSignIn from '@/components/ui/AuthForms/EmailSignIn';

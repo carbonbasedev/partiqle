@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { SignOut } from '@/utils/auth-helpers/server';
-import { handleRequest } from '@/utils/auth-helpers/client';
-import Logo from '@/components/icons/Logo';
+import { SignOut } from '@/utils/supabase/auth-helpers/server';
+import { handleRequest } from '@/utils/supabase/auth-helpers/client';
 import { usePathname, useRouter } from 'next/navigation';
-import { getRedirectMethod } from '@/utils/auth-helpers/settings';
+import { getRedirectMethod } from '@/utils/supabase/auth-helpers/settings';
 import s from './Navbar.module.css';
 
 interface NavlinksProps {
@@ -19,16 +18,20 @@ export default function Navlinks({ user }: NavlinksProps) {
     <div className="relative flex flex-row justify-between py-4 align-center md:py-6">
       <div className="flex items-center flex-1">
         <Link href="/" className={s.logo} aria-label="Logo">
-          <Logo />
         </Link>
         <nav className="ml-6 space-x-2 lg:block">
           <Link href="/" className={s.link}>
             Pricing
           </Link>
           {user && (
-            <Link href="/account" className={s.link}>
-              Account
-            </Link>
+            <>
+              <Link href="/businesses" className={s.link}>
+                Businesses
+              </Link>
+              <Link href="/account" className={s.link}>
+                Account
+              </Link>
+            </>
           )}
         </nav>
       </div>

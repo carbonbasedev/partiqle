@@ -62,7 +62,7 @@ export default async function BusinessesPage() {
                       {business.description}
                     </p>
                   )}
-                  <div className="text-xs text-zinc-500">
+                  <div className="text-xs text-zinc-500 mb-4">
                     {business.created_at && (
                       <p>
                         Created:{' '}
@@ -70,6 +70,12 @@ export default async function BusinessesPage() {
                       </p>
                     )}
                   </div>
+                  <Link
+                    href={`/businesses/${business.id}/lines`}
+                    className="inline-block px-4 py-2 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+                  >
+                    Manage Lines
+                  </Link>
                   {/* Display all other fields as JSON for debugging/development */}
                   {process.env.NODE_ENV === 'development' && (
                     <details className="mt-4">

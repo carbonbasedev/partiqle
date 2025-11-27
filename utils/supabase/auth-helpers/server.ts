@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getURL, getErrorRedirect, getStatusRedirect } from 'utils/helpers';
-import { getAuthTypes } from 'utils/auth-helpers/settings';
+import { getAuthTypes } from '@/utils/supabase/auth-helpers/settings';
 
 function isValidEmail(email: string) {
   var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -327,66 +327,7 @@ export async function updateName(formData: FormData) {
       'Your name has been updated.'
     );
   } else {
-    return getErrorRedirect(
-      '/account',
-      'Hmm... Something went wrong.',
-      'Your name could not be updated.'
-    );
+    return getErrorRedirect('/account', 'Your name could not be updated.', 'Unknown error.');
   }
 }
 
-export async function addBusiness(formData: FormData) {
-  // Get form data
-  const name = String(formData.get('name')).trim();
-  const description = String(formData.get('description')).trim() || null;
-
-  // Validate required fields
-  if (!name) {
-    return getErrorRedirect(
-      '/businesses/new',
-      'Business creation failed.',
-      'Business name is required.'
-    );
-  }
-
-  const supabase = createClient();
-  
-  // Get the current user
-  const {
-    data: { user },
-    error: userError
-  } = await supabase.auth.getUser();
-
-  if (userError || !user) {
-    return getErrorRedirect(
-      '/businesses/new',
-      'Business creation failed.',
-      'You must be logged in to create a business.'
-    );
-  }
-
-  // Insert the business
-  const { error: insertError } = await supabase
-    .from('businesses')
-    .insert([
-      {
-        name,
-        description,
-        user_id: user.id
-      }
-    ]);
-
-  if (insertError) {
-    return getErrorRedirect(
-      '/businesses/new',
-      'Business creation failed.',
-      insertError.message
-    );
-  }
-
-  return getStatusRedirect(
-    '/businesses',
-    'Success!',
-    'Your business has been created.'
-  );
-}
