@@ -112,15 +112,22 @@ export async function callPosition(formData: FormData) {
   // Update position status to 'called'
   const { error: updateError } = await supabase
     .from('positions')
-    .update({ status: 'called' })
+    .update({ status: 'called'} as never)
     .eq('id', positionId);
 
+  if (!position) {
+      return getErrorRedirect(
+        `/businesses/${businessId}/lines/${lineId}`,
+        'Failed to call position.',
+        'Position not found.'
+      );
+    }
+  
   // Update line's current position
   const { error: lineUpdateError } = await supabase
     .from('lines')
-    .update({ position: position.position })
+    .update({ position: position?.position } as never)
     .eq('id', lineId);
-
 
   return getStatusRedirect(
     `/businesses/${businessId}/lines/${lineId}`,
