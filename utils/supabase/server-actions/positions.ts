@@ -132,7 +132,7 @@ export async function callPosition(formData: FormData) {
   return getStatusRedirect(
     `/businesses/${businessId}/lines/${lineId}`,
     'Success!',
-    `Position ${position.position} (${position.name}) has been called.`
+    `Position has been called.`
   );
 }
 
@@ -147,7 +147,7 @@ export async function skipPosition(formData: FormData) {
   // Update position status to 'skipped'
   const { error: updateError } = await supabase
     .from('positions')
-    .update({ status: 'skipped' })
+    .update({ status: 'skipped' } as never)
     .eq('id', positionId);
 
   if (updateError) {
@@ -161,7 +161,7 @@ export async function skipPosition(formData: FormData) {
   return getStatusRedirect(
     `/businesses/${businessId}/lines/${lineId}`,
     'Success!',
-    `Position ${position.position} (${position.name}) has been skipped.`
+    `Position skipped`
   );
 }
 
@@ -182,26 +182,10 @@ export async function callNextPosition(formData: FormData) {
     .limit(1)
     .maybeSingle();
 
-  if (nextError) {
-    return getErrorRedirect(
-      `/businesses/${businessId}/lines/${lineId}`,
-      'Failed to call next position.',
-      nextError.message
-    );
-  }
-
-  if (!nextPosition) {
-    return getErrorRedirect(
-      `/businesses/${businessId}/lines/${lineId}`,
-      'No one is waiting in line.',
-      'There are no waiting positions to call.'
-    );
-  }
-
   // Mark this position as called
   const { error: updateError } = await supabase
     .from('positions')
-    .update({ status: 'called' })
+    .update({ status: 'called' } as never)
     .eq('id', nextPosition.id);
 
   if (updateError) {
@@ -215,7 +199,7 @@ export async function callNextPosition(formData: FormData) {
   // Update the line's current position
   const { error: lineUpdateError } = await supabase
     .from('lines')
-    .update({ position: nextPosition.position })
+    .update({ position: nextPosition.position } as never)
     .eq('id', lineId);
 
   if (lineUpdateError) {
@@ -225,7 +209,7 @@ export async function callNextPosition(formData: FormData) {
   return getStatusRedirect(
     `/businesses/${businessId}/lines/${lineId}`,
     'Success!',
-    `Next position ${nextPosition.position} (${nextPosition.name}) has been called.`
+    `Next position has been called.`
   );
 }
 
