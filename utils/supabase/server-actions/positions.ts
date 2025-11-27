@@ -102,6 +102,13 @@ export async function callPosition(formData: FormData) {
 
   const supabase = createClient();
 
+  const { data: position } = await supabase
+  .from('positions')
+  .select('*')
+  .eq('id', positionId)
+  .eq('line_id', lineId)
+  .single();
+  
   // Update position status to 'called'
   const { error: updateError } = await supabase
     .from('positions')
