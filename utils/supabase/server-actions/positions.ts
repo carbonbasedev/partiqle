@@ -25,7 +25,7 @@ export async function addPosition(formData: FormData) {
   const nextPosition = lastPosition?.position ? Number(lastPosition.position) + 1 : 1;
 
   // Insert the position
-  const { error: insertError } = await supabase
+  await supabase
     .from('positions')
     .insert([
       {
@@ -64,7 +64,7 @@ export async function joinLinePublic(formData: FormData) {
   const nextPosition = lastPosition?.position ? Number(lastPosition.position) + 1 : 1;
 
   // Insert the position and return the created row
-  const { data: newPositionRaw, error: insertError } = await supabase
+  const { data: newPositionRaw} = await supabase
     .from('positions')
     .insert([
       {
@@ -80,16 +80,8 @@ export async function joinLinePublic(formData: FormData) {
 
   const newPosition = newPositionRaw as Pick<Database['public']['Tables']['positions']['Row'], 'id' | 'position'> | null;
 
-  if (!newPosition) {
-    return getErrorRedirect(
-      `/lines/${lineId}/join`,
-      'Join failed.',
-      'Unable to join the line.'
-    );
-  }
-
   return getStatusRedirect(
-    `/lines/${lineId}/positions/${newPosition.id}`,
+    `/lines/${lineId}/positions/${newPosition?.id}`,
     'You\'re in line!',
     `You are position #${newPosition?.position}.`
   );
@@ -106,25 +98,16 @@ export async function callPosition(formData: FormData) {
   .from('positions')
   .select('*')
   .eq('id', positionId)
-  .eq('line_id', lineId)
   .single();
   
   // Update position status to 'called'
-  const { error: updateError } = await supabase
+  await supabase
     .from('positions')
     .update({ status: 'called'} as never)
     .eq('id', positionId);
-
-  if (!position) {
-      return getErrorRedirect(
-        `/businesses/${businessId}/lines/${lineId}`,
-        'Failed to call position.',
-        'Position not found.'
-      );
-    }
   
   // Update line's current position
-  const { error: lineUpdateError } = await supabase
+  await supabase
     .from('lines')
     .update({ position: position?.position } as never)
     .eq('id', lineId);
@@ -143,20 +126,11 @@ export async function skipPosition(formData: FormData) {
 
   const supabase = createClient();
 
-
   // Update position status to 'skipped'
-  const { error: updateError } = await supabase
+  await supabase
     .from('positions')
     .update({ status: 'skipped' } as never)
     .eq('id', positionId);
-
-  if (updateError) {
-    return getErrorRedirect(
-      `/businesses/${businessId}/lines/${lineId}`,
-      'Failed to skip position.',
-      updateError.message
-    );
-  }
 
   return getStatusRedirect(
     `/businesses/${businessId}/lines/${lineId}`,
@@ -169,11 +143,10 @@ export async function callNextPosition(formData: FormData) {
   const lineId = String(formData.get('lineId')).trim();
   const businessId = String(formData.get('businessId')).trim();
 
-
   const supabase = createClient();
 
   // Find the next waiting position in this line
-  const { data: nextPosition, error: nextError } = await supabase
+  const { data: nextPosition } = await supabase
     .from('positions')
     .select('*')
     .eq('line_id', lineId)
@@ -182,37 +155,18 @@ export async function callNextPosition(formData: FormData) {
     .limit(1)
     .maybeSingle();
 
-  if (!nextPosition) {
-    return getErrorRedirect(
-      `/businesses/${businessId}/lines/${lineId}`,
-      'Failed to call next position.',
-      'No next position found.'
-    );
-  }
-
   // Mark this position as called
-  const { error: updateError } = await supabase
+  await supabase
     .from('positions')
     .update({ status: 'called' } as never)
-    .eq('id', nextPosition.id);
-
-  if (updateError) {
-    return getErrorRedirect(
-      `/businesses/${businessId}/lines/${lineId}`,
-      'Failed to call next position.',
-      updateError.message
-    );
-  }
+    .eq('id', nextPosition?.id);
 
   // Update the line's current position
-  const { error: lineUpdateError } = await supabase
+  await supabase
     .from('lines')
     .update({ position: nextPosition?.position } as never)
     .eq('id', lineId);
 
-  if (lineUpdateError) {
-    console.error('Error updating line position:', lineUpdateError);
-  }
 
   return getStatusRedirect(
     `/businesses/${businessId}/lines/${lineId}`,
