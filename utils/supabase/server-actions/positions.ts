@@ -182,6 +182,14 @@ export async function callNextPosition(formData: FormData) {
     .limit(1)
     .maybeSingle();
 
+  if (!nextPosition) {
+    return getErrorRedirect(
+      `/businesses/${businessId}/lines/${lineId}`,
+      'Failed to call next position.',
+      'No next position found.'
+    );
+  }
+
   // Mark this position as called
   const { error: updateError } = await supabase
     .from('positions')
@@ -199,7 +207,7 @@ export async function callNextPosition(formData: FormData) {
   // Update the line's current position
   const { error: lineUpdateError } = await supabase
     .from('lines')
-    .update({ position: nextPosition.position } as never)
+    .update({ position: nextPosition?.position } as never)
     .eq('id', lineId);
 
   if (lineUpdateError) {
