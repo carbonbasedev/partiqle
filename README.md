@@ -1,4 +1,4 @@
-# Next.js Subscription Payments Starter2
+# Next.js Subscription Payments Starter3
 
 
 > [!WARNING]  
