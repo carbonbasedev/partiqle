@@ -159,7 +159,7 @@ export async function callNextPosition(formData: FormData) {
   await supabase
     .from('positions')
     .update({ status: 'called' } as never)
-    .eq('id', nextPosition?.id);
+    .eq('id', nextPosition?.id ?? '0');
 
   // Update the line's current position
   await supabase
