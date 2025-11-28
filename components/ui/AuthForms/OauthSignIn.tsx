@@ -25,11 +25,6 @@ const GoogleIcon = () => (
 export default function OauthSignIn() {
   const oAuthProviders: OAuthProviders[] = [
     {
-      name: 'github',
-      displayName: 'GitHub',
-      icon: <Github className="h-5 w-5" />
-    },
-    {
       name: 'google',
       displayName: 'Google',
       icon: <GoogleIcon />
