@@ -1,6 +1,5 @@
 'use server';
 
-import type { TablesInsert } from '@/types_db';
 import { createClient } from '@/utils/supabase/server';
 import { getErrorRedirect, getStatusRedirect } from 'utils/helpers';
 
@@ -25,15 +24,15 @@ export async function addBusiness(formData: FormData) {
   }
 
   // Insert the business
-  const businessData: TablesInsert<'businesses'> = {
-    name,
-    description,
-    user_id: user.id
-  };
-
   await supabase
     .from('businesses')
-    .insert([businessData]);
+    .insert([
+      {
+        name,
+        description,
+        user_id: user.id
+      }
+    ] as any);
 
   return getStatusRedirect(
     '/businesses',
