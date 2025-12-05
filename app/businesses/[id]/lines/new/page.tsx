@@ -6,16 +6,17 @@ import AddLineForm from '@/components/ui/LineForms/AddLineForm';
 export default async function NewLinePage({
   params
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser(supabase);
 
   if (!user) {
     return redirect('/signin');
   }
 
-  const business = await getBusiness(supabase, params.id);
+  const { id } = await params;
+  const business = await getBusiness(supabase, id);
 
   if (!business) {
     return redirect('/businesses');
@@ -39,7 +40,7 @@ export default async function NewLinePage({
         </div>
       </div>
       <div className="max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
-        <AddLineForm businessId={params.id} />
+        <AddLineForm businessId={id} />
       </div>
     </section>
   );

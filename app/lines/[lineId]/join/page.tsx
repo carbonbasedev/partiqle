@@ -6,11 +6,12 @@ import PublicJoinLineForm from '@/components/ui/LineForms/PublicJoinLineForm';
 export default async function PublicJoinLinePage({
   params
 }: {
-  params: { lineId: string };
+  params: Promise<{ lineId: string }>;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
-  const line = await getLineById(supabase, params.lineId);
+  const { lineId } = await params;
+  const line = await getLineById(supabase, lineId);
 
   if (!line) {
     return redirect('/');
@@ -29,7 +30,7 @@ export default async function PublicJoinLinePage({
             your details to get your position.
           </p>
         </div>
-        <PublicJoinLineForm lineId={params.lineId} />
+        <PublicJoinLineForm lineId={lineId} />
       </div>
     </section>
   );

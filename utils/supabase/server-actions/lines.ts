@@ -7,7 +7,7 @@ export async function addLine(formData: FormData) {
   const name = String(formData.get('name')).trim();
   const businessId = String(formData.get('businessId')).trim();
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Insert the line
   await supabase

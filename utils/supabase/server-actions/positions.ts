@@ -10,7 +10,7 @@ export async function addPosition(formData: FormData) {
   const lineId = String(formData.get('lineId')).trim();
   const businessId = String(formData.get('businessId')).trim();
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get the highest position number for this line
   const { data: lastPositionRaw } = await supabase
@@ -49,7 +49,7 @@ export async function joinLinePublic(formData: FormData) {
   const phone = String(formData.get('phone')).trim() || null;
   const lineId = String(formData.get('lineId')).trim();
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: lastPositionRaw } = await supabase
     .from('positions')
@@ -92,7 +92,7 @@ export async function callPosition(formData: FormData) {
   const lineId = String(formData.get('lineId')).trim();
   const businessId = String(formData.get('businessId')).trim();
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: position } = await supabase
   .from('positions')
@@ -124,7 +124,7 @@ export async function skipPosition(formData: FormData) {
   const lineId = String(formData.get('lineId')).trim();
   const businessId = String(formData.get('businessId')).trim();
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Update position status to 'skipped'
   await supabase
@@ -143,7 +143,7 @@ export async function callNextPosition(formData: FormData) {
   const lineId = String(formData.get('lineId')).trim();
   const businessId = String(formData.get('businessId')).trim();
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Find the next waiting position in this line
   const { data: nextPosition } = await supabase

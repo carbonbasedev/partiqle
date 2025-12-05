@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { getUser, getBusinesses } from '@/utils/supabase/queries';
 
 export default async function BusinessesPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser(supabase);
 
   if (!user) {

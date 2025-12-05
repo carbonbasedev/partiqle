@@ -4,7 +4,7 @@ import { getUser } from '@/utils/supabase/queries';
 import AddBusinessForm from '@/components/ui/BusinessForms/AddBusinessForm';
 
 export default async function NewBusinessPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser(supabase);
 
   if (!user) {

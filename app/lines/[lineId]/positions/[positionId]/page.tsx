@@ -5,18 +5,19 @@ import { getLineWithPositions } from '@/utils/supabase/queries';
 export default async function PublicPositionPage({
   params
 }: {
-  params: { lineId: string; positionId: string };
+  params: Promise<{ lineId: string; positionId: string }>;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
-  const lineData = await getLineWithPositions(supabase, params.lineId);
+  const { lineId, positionId } = await params;
+  const lineData = await getLineWithPositions(supabase, lineId);
 
   if (!lineData || !lineData.positions) {
     return notFound();
   }
 
   const position = (lineData.positions as any[]).find(
-    (p) => String(p.id) === String(params.positionId)
+    (p) => String(p.id) === String(positionId)
   );
 
   if (!position) {
@@ -65,7 +66,7 @@ export default async function PublicPositionPage({
               {isCalled ? 'Currently being served' : 'Waiting'}
             </span>
             <div className="text-right text-xs text-zinc-400">
-              <p>Line ID: {params.lineId}</p>
+              <p>Line ID: {lineId}</p>
             </div>
           </div>
         </div>

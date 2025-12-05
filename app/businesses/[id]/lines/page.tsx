@@ -6,16 +6,17 @@ import { getUser, getBusiness, getLinesByBusiness } from '@/utils/supabase/queri
 export default async function BusinessLinesPage({
   params
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser(supabase);
 
   if (!user) {
     return redirect('/signin');
   }
 
-  const business = await getBusiness(supabase, params.id);
+  const { id } = await params;
+  const business = await getBusiness(supabase, id);
   
   if (!business) {
     return redirect('/businesses');
@@ -26,7 +27,7 @@ export default async function BusinessLinesPage({
     return redirect('/businesses');
   }
 
-  const lines = await getLinesByBusiness(supabase, params.id);
+  const lines = await getLinesByBusiness(supabase, id);
 
   return (
     <section className="mb-32 bg-black">
@@ -49,7 +50,7 @@ export default async function BusinessLinesPage({
             ← Back to Businesses
           </Link>
           <Link
-            href={`/businesses/${params.id}/lines/new`}
+            href={`/businesses/${id}/lines/new`}
             className="px-4 py-2 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
           >
             + Add New Line
@@ -61,7 +62,7 @@ export default async function BusinessLinesPage({
               No lines found. Create your first line to get started.
             </p>
             <Link
-              href={`/businesses/${params.id}/lines/new`}
+              href={`/businesses/${id}/lines/new`}
               className="inline-block px-6 py-3 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
             >
               Create Your First Line
@@ -72,7 +73,7 @@ export default async function BusinessLinesPage({
             {lines.map((line: any) => (
               <Link
                 key={line.id}
-                href={`/businesses/${params.id}/lines/${line.id}`}
+                href={`/businesses/${id}/lines/${line.id}`}
                 className="w-full border rounded-md border-zinc-700 bg-zinc-900 hover:border-zinc-600 transition-colors block"
               >
                 <div className="px-5 py-4">

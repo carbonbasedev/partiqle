@@ -8,7 +8,7 @@ export async function addBusiness(formData: FormData) {
   const name = String(formData.get('name')).trim();
   const description = String(formData.get('description')).trim() || null;
 
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

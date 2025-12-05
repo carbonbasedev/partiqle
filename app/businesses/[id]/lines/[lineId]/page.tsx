@@ -10,16 +10,17 @@ import { getURL } from 'utils/helpers';
 export default async function LineManagementPage({
   params
 }: {
-  params: { id: string; lineId: string };
+  params: Promise<{ id: string; lineId: string }>;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const user = await getUser(supabase);
 
   if (!user) {
     return redirect('/signin');
   }
 
-  const business = await getBusiness(supabase, params.id);
+  const { id, lineId } = await params;
+  const business = await getBusiness(supabase, id);
 
   if (!business) {
     return redirect('/businesses');
@@ -30,10 +31,10 @@ export default async function LineManagementPage({
     return redirect('/businesses');
   }
 
-  const lineData = await getLineWithPositions(supabase, params.lineId);
+  const lineData = await getLineWithPositions(supabase, lineId);
 
-  if (!lineData || !lineData.id || lineData.business_id !== params.id) {
-    return redirect(`/businesses/${params.id}/lines`);
+  if (!lineData || !lineData.id || lineData.business_id !== id) {
+    return redirect(`/businesses/${id}/lines`);
   }
 
   // Separate positions by status
@@ -63,7 +64,7 @@ export default async function LineManagementPage({
   const lastCalledPosition =
     pastCalledPositions.length > 0 ? pastCalledPositions[0] : null;
 
-  const publicJoinUrl = getURL(`/lines/${params.lineId}/join`);
+  const publicJoinUrl = getURL(`/lines/${lineId}/join`);
   const qrData = encodeURIComponent(publicJoinUrl);
   const qrImageSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qrData}`;
 
@@ -82,7 +83,7 @@ export default async function LineManagementPage({
       <div className="max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
         <div className="mt-8 mb-4 flex items-center justify-between gap-4 flex-wrap">
           <Link
-            href={`/businesses/${params.id}/lines`}
+            href={`/businesses/${id}/lines`}
             className="px-4 py-2 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 hover:border-zinc-600 transition-colors inline-block"
           >
             ← Back to Lines
@@ -97,8 +98,8 @@ export default async function LineManagementPage({
               )}
             </div>
             <NextInLineButton
-              businessId={params.id}
-              lineId={params.lineId}
+              businessId={id}
+              lineId={lineId}
               disabled={waitingPositions.length === 0}
             />
           </div>
@@ -191,7 +192,7 @@ export default async function LineManagementPage({
 
         {/* Add Position Form */}
         <div className="mb-8">
-          <AddPositionForm businessId={params.id} lineId={params.lineId} />
+          <AddPositionForm businessId={id} lineId={lineId} />
         </div>
 
         {/* Waiting Positions */}
@@ -224,8 +225,8 @@ export default async function LineManagementPage({
                   </div>
                   <PositionActions
                     position={position}
-                    businessId={params.id}
-                    lineId={params.lineId}
+                    businessId={id}
+                    lineId={lineId}
                   />
                 </div>
               ))}
