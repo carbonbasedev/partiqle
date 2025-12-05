@@ -100,6 +100,8 @@ export async function callPosition(formData: FormData) {
   .eq('id', positionId)
   .single();
   
+  const positionData = position as Database['public']['Tables']['positions']['Row'] | null;
+  
   // Update position status to 'called'
   await supabase
     .from('positions')
@@ -109,7 +111,7 @@ export async function callPosition(formData: FormData) {
   // Update line's current position
   await supabase
     .from('lines')
-    .update({ position: position?.position } as never)
+    .update({ position: positionData?.position ?? null } as never)
     .eq('id', lineId);
 
   return getStatusRedirect(
@@ -155,16 +157,18 @@ export async function callNextPosition(formData: FormData) {
     .limit(1)
     .maybeSingle();
 
+  const nextPositionData = nextPosition as Database['public']['Tables']['positions']['Row'] | null;
+
   // Mark this position as called
   await supabase
     .from('positions')
     .update({ status: 'called' } as never)
-    .eq('id', nextPosition?.id ?? '0');
+    .eq('id', nextPositionData?.id ?? '0');
 
   // Update the line's current position
   await supabase
     .from('lines')
-    .update({ position: nextPosition?.position } as never)
+    .update({ position: nextPositionData?.position ?? null } as never)
     .eq('id', lineId);
 
 
