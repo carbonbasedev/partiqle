@@ -83,7 +83,7 @@ export const getLinesByBusiness = cache(async (supabase: SupabaseClient, busines
   return lines || [];
 });
 
-export const getLineById = cache(async (supabase: SupabaseClient, lineId: string) => {
+export const getLineById = cache(async (supabase: SupabaseClient, lineId: string): Promise<Database['public']['Tables']['lines']['Row'] | null> => {
   const { data: line, error } = await supabase
     .from('lines')
     .select('*')
