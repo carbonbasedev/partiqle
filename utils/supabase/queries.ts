@@ -53,7 +53,7 @@ export const getBusinesses = cache(async (supabase: SupabaseClient) => {
   return businesses || [];
 });
 
-export const getBusiness = cache(async (supabase: SupabaseClient, businessId: string) => {
+export const getBusiness = cache(async (supabase: SupabaseClient, businessId: string): Promise<Database['public']['Tables']['businesses']['Row'] | null> => {
   const { data: business, error } = await supabase
     .from('businesses')
     .select('*')
@@ -113,7 +113,7 @@ export const getPositionsByLine = cache(async (supabase: SupabaseClient, lineId:
   return positions || [];
 });
 
-export const getLineWithPositions = cache(async (supabase: SupabaseClient, lineId: string) => {
+export const getLineWithPositions = cache(async (supabase: SupabaseClient, lineId: string): Promise<(Database['public']['Tables']['lines']['Row'] & { positions: Database['public']['Tables']['positions']['Row'][] }) | null> => {
   const { data: line, error: lineError } = await supabase
     .from('lines')
     .select('*')
@@ -133,8 +133,8 @@ export const getLineWithPositions = cache(async (supabase: SupabaseClient, lineI
 
   if (positionsError) {
     console.error('Error fetching positions:', positionsError);
-    return { ...(line as Record<string, unknown>), positions: [] };
+    return { ...(line as Database['public']['Tables']['lines']['Row']), positions: [] };
   }
 
-  return { ...(line as Record<string, unknown>), positions: positions || [] };
+  return { ...(line as Database['public']['Tables']['lines']['Row']), positions: positions || [] };
 });
