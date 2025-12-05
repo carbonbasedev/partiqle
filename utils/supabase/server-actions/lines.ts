@@ -18,7 +18,7 @@ export async function addLine(formData: FormData) {
         business_id: businessId,
         position: 0
       }
-    ]);
+    ] as any);
 
   return getStatusRedirect(
     `/businesses/${businessId}/lines`,
