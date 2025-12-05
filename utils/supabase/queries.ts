@@ -1,5 +1,6 @@
-import { SupabaseClient } from '@supabase/supabase-js';
 import { cache } from 'react';
+import type { SupabaseClient } from '@/utils/supabase/server';
+import type { Database } from '@/types_db';
 
 export const getUser = cache(async (supabase: SupabaseClient) => {
   const {
@@ -30,7 +31,7 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
   return products;
 });
 
-export const getUserDetails = cache(async (supabase: SupabaseClient) => {
+export const getUserDetails = cache(async (supabase: SupabaseClient): Promise<Database['public']['Tables']['users']['Row'] | null> => {
   const { data: userDetails } = await supabase
     .from('users')
     .select('*')
@@ -132,8 +133,8 @@ export const getLineWithPositions = cache(async (supabase: SupabaseClient, lineI
 
   if (positionsError) {
     console.error('Error fetching positions:', positionsError);
-    return { ...line, positions: [] };
+    return { ...(line as Record<string, unknown>), positions: [] };
   }
 
-  return { ...line, positions: positions || [] };
+  return { ...(line as Record<string, unknown>), positions: positions || [] };
 });

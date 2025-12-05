@@ -41,3 +41,6 @@ export const createClient = async () => {
     }
   );
 };
+
+// Export the client type for use in other files
+export type SupabaseClient = Awaited<ReturnType<typeof createClient>>;
