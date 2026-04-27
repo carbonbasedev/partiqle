@@ -27,4 +27,41 @@ export async function addLine(formData: FormData) {
   );
 }
 
+export async function togglePaused(formData: FormData) {
+  const lineId = String(formData.get('lineId')).trim();
+  const businessId = String(formData.get('businessId')).trim();
+  const paused = String(formData.get('paused')) === 'true';
 
+  const supabase = await createClient();
+
+  await supabase
+    .from('lines')
+    .update({ paused: !paused } as never)
+    .eq('id', lineId);
+
+  return getStatusRedirect(
+    `/businesses/${businessId}/lines/${lineId}`,
+    'Success!',
+    paused ? 'Line resumed.' : 'Line paused — new joins blocked.'
+  );
+}
+
+export async function resetLine(formData: FormData) {
+  const lineId = String(formData.get('lineId')).trim();
+  const businessId = String(formData.get('businessId')).trim();
+
+  const supabase = await createClient();
+
+  // Delete every position for this line, then reset the served counter.
+  await supabase.from('positions').delete().eq('line_id', lineId);
+  await supabase
+    .from('lines')
+    .update({ position: 0 } as never)
+    .eq('id', lineId);
+
+  return getStatusRedirect(
+    `/businesses/${businessId}/lines/${lineId}`,
+    'Line reset.',
+    'All positions were removed and numbering restarts at 1.'
+  );
+}

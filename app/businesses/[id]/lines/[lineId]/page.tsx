@@ -8,6 +8,8 @@ import PositionActions from '@/components/ui/LineForms/PositionActions';
 import NextInLineButton from '@/components/ui/LineForms/NextInLineButton';
 import { getURL } from 'utils/helpers';
 import RealtimeRefresh from '@/components/RealtimeRefresh';
+import QueueVisual from '@/components/ui/LineForms/QueueVisual';
+import LineAdminControls from '@/components/ui/LineForms/LineAdminControls';
 
 export default async function LineManagementPage({
   params
@@ -105,9 +107,33 @@ export default async function LineManagementPage({
           <NextInLineButton
             businessId={id}
             lineId={lineId}
-            disabled={waitingPositions.length === 0}
+            disabled={waitingPositions.length === 0 || (lineData as any).paused}
           />
         </div>
+        <div className="mt-6">
+          <LineAdminControls
+            lineId={lineId}
+            businessId={id}
+            paused={Boolean((lineData as any).paused)}
+          />
+        </div>
+        {(lineData as any).paused && (
+          <div
+            className="pq-mono mt-5 inline-flex items-center gap-2"
+            style={{
+              padding: '8px 14px',
+              borderRadius: 8,
+              border: '1px solid oklch(0.78 0.16 70 / 0.4)',
+              background: 'oklch(0.78 0.16 70 / 0.10)',
+              color: 'oklch(0.85 0.16 70)',
+              fontSize: 11,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase'
+            }}
+          >
+            ❚❚  Line paused — new joins blocked
+          </div>
+        )}
       </div>
 
       {/* Now-serving ticket display */}
@@ -226,6 +252,13 @@ export default async function LineManagementPage({
                   Waiting · {waitingPositions.length}
                 </h2>
               </div>
+            </div>
+
+            <div className="mb-6 pb-6" style={{ borderBottom: '1px solid var(--pq-line)' }}>
+              <QueueVisual
+                positions={waitingPositions as any}
+                nowServing={lineData.position}
+              />
             </div>
 
             {waitingPositions.length === 0 ? (

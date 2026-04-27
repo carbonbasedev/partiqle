@@ -51,6 +51,19 @@ export async function joinLinePublic(formData: FormData) {
 
   const supabase = await createClient();
 
+  const { data: lineRow } = await supabase
+    .from('lines')
+    .select('paused')
+    .eq('id', lineId)
+    .maybeSingle();
+  if ((lineRow as any)?.paused) {
+    return getErrorRedirect(
+      `/lines/${lineId}/join`,
+      'Line is paused.',
+      'This line is not accepting new joins right now.'
+    );
+  }
+
   const { data: lastPositionRaw } = await supabase
     .from('positions')
     .select('*')

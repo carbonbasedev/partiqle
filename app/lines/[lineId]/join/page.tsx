@@ -17,6 +17,8 @@ export default async function PublicJoinLinePage({
     return redirect('/');
   }
 
+  const isPaused = Boolean((line as any).paused);
+
   return (
     <section
       className="relative min-h-screen flex items-center justify-center px-4 py-12"
@@ -66,7 +68,29 @@ export default async function PublicJoinLinePage({
             Leave your name and you&apos;ll get a live ticket. Keep the next page open — we&apos;ll update it as you move up.
           </p>
         </div>
-        <PublicJoinLineForm lineId={lineId} />
+        {isPaused ? (
+          <div
+            className="pq-card text-center"
+            style={{ padding: 32 }}
+          >
+            <div
+              className="pq-mono mb-3"
+              style={{
+                fontSize: 11,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'var(--pq-ink-3)'
+              }}
+            >
+              ❚❚  Line paused
+            </div>
+            <p style={{ color: 'var(--pq-ink-1)', fontSize: 16, lineHeight: 1.5 }}>
+              This line isn&apos;t accepting new joins right now. Check back in a few minutes.
+            </p>
+          </div>
+        ) : (
+          <PublicJoinLineForm lineId={lineId} />
+        )}
         <p
           className="pq-mono text-center mt-8"
           style={{
