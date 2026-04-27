@@ -5,11 +5,11 @@ type Price = Tables<'prices'>;
 export const getURL = (path: string = '', host?: string) => {
   // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
   let url =
-    process?.env?.NEXT_PUBLIC_SITE_URL &&
+    process.env.NEXT_PUBLIC_SITE_URL &&
     process.env.NEXT_PUBLIC_SITE_URL.trim() !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL.trim()
       : // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
-        process?.env?.NEXT_PUBLIC_VERCEL_URL &&
+        process.env.NEXT_PUBLIC_VERCEL_URL &&
           process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ''
         ? process.env.NEXT_PUBLIC_VERCEL_URL.trim()
         : // If neither is set, use the host from the incoming request or fallback to localhost.
