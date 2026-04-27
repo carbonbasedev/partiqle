@@ -22,18 +22,26 @@ export default async function Account() {
   }
 
   return (
-    <section className="mb-32 bg-black">
-      <div className="max-w-6xl px-4 py-8 mx-auto sm:px-6 sm:pt-24 lg:px-8">
-        <div className="sm:align-center sm:flex sm:flex-col">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Account
-          </h1>
-          <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            We partnered with Stripe for a simplified billing.
-          </p>
-        </div>
+    <section className="relative">
+      <div className="absolute inset-x-0 top-0 h-[360px] pq-grid-bg pointer-events-none" aria-hidden="true" />
+      <div className="max-w-4xl mx-auto px-6 pt-16 sm:pt-24 pb-8 relative">
+        <div className="pq-eyebrow mb-4">Settings</div>
+        <h1
+          style={{
+            fontSize: 44,
+            fontWeight: 600,
+            letterSpacing: '-0.03em',
+            color: 'var(--pq-ink-0)',
+            lineHeight: 1.02
+          }}
+        >
+          Account
+        </h1>
+        <p className="mt-3" style={{ color: 'var(--pq-ink-2)', fontSize: 16, maxWidth: 560 }}>
+          Manage your profile, email and subscription. Billing is handled securely through Stripe.
+        </p>
       </div>
-      <div className="p-4">
+      <div className="max-w-4xl mx-auto px-6 relative">
         <CustomerPortalForm subscription={subscription} />
         <NameForm userName={userDetails?.full_name ?? ''} />
         <EmailForm userEmail={user.email} />

@@ -23,12 +23,12 @@ export default function AddLineForm({ businessId }: AddLineFormProps) {
 
   return (
     <Card
-      title="Add New Line"
-      description="Create a new virtual waiting line for your business."
+      title="Add a new line"
+      description="People can join this line and wait off-site for their turn."
       footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">
-            People can join this line and wait for their turn.
+        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center gap-3">
+          <p className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+            You can add positions after it&apos;s created
           </p>
           <Button
             variant="slim"
@@ -36,33 +36,28 @@ export default function AddLineForm({ businessId }: AddLineFormProps) {
             form="addLineForm"
             loading={isSubmitting}
           >
-            Create Line
+            Create line
           </Button>
         </div>
       }
     >
-      <div className="mt-8 mb-4">
+      <div className="mt-6 mb-2">
         <form id="addLineForm" onSubmit={(e) => handleSubmit(e)}>
           <input type="hidden" name="businessId" value={businessId} />
-          <div className="grid gap-4">
-            <div className="grid gap-1">
-              <label htmlFor="name" className="text-sm font-medium text-zinc-300">
-                Line Name *
-              </label>
-              <input
-                id="name"
-                type="text"
-                name="name"
-                className="w-full p-3 rounded-md bg-zinc-800 text-white placeholder-zinc-500 border border-zinc-700 focus:border-zinc-600 focus:outline-none"
-                placeholder="e.g., Customer Service, Checkout, Consultation"
-                required
-                maxLength={255}
-              />
-            </div>
+          <div>
+            <label htmlFor="name" className="pq-label">Line name *</label>
+            <input
+              id="name"
+              type="text"
+              name="name"
+              className="pq-input"
+              placeholder="e.g. Customer service, Checkout, Consultation"
+              required
+              maxLength={255}
+            />
           </div>
         </form>
       </div>
     </Card>
   );
 }
-

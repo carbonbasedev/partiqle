@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
@@ -26,7 +27,6 @@ export default async function LineManagementPage({
     return redirect('/businesses');
   }
 
-  // Verify user owns the business
   if (business.user_id !== user.id) {
     return redirect('/businesses');
   }
@@ -37,7 +37,11 @@ export default async function LineManagementPage({
     return redirect(`/businesses/${id}/lines`);
   }
 
-  // Separate positions by status
+  const host = (await headers()).get('host') ?? undefined;
+  const publicJoinUrl = getURL(`/lines/${lineId}/join`, host);
+  const qrData = encodeURIComponent(publicJoinUrl);
+  const qrImageSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${qrData}&bgcolor=0b0b10&color=fafafa&margin=6`;
+
   const waitingPositions = (lineData.positions || []).filter(
     (p: any) => p.status === 'waiting'
   );
@@ -55,238 +59,364 @@ export default async function LineManagementPage({
     }
   );
 
-  // Get currently called position (if any)
   const currentPosition = calledPositions.find(
     (p: any) => p.position === lineData.position
   );
 
-  // Get the last called/skipped position (most recent in history)
   const lastCalledPosition =
     pastCalledPositions.length > 0 ? pastCalledPositions[0] : null;
 
-  const publicJoinUrl = getURL(`/lines/${lineId}/join`);
-  const qrData = encodeURIComponent(publicJoinUrl);
-  const qrImageSrc = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${qrData}`;
+  const fmtNum = (n: number | null | undefined) => String(n ?? 0).padStart(3, '0');
+  const totalServed = pastCalledPositions.filter((p: any) => p.status === 'called').length;
 
   return (
-    <section className="mb-32 bg-black">
-      <div className="max-w-6xl px-4 py-8 mx-auto sm:px-6 sm:pt-24 lg:px-8">
-        <div className="sm:align-center sm:flex sm:flex-col">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            {lineData.name}
-          </h1>
-          <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            Manage positions in this line
-          </p>
+    <section className="relative">
+      <div className="absolute inset-x-0 top-0 h-[360px] pq-grid-bg pointer-events-none" aria-hidden="true" />
+
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-6 pt-16 sm:pt-20 pb-6 relative">
+        <Link
+          href={`/businesses/${id}/lines`}
+          className="pq-mono inline-flex items-center gap-2 mb-6"
+          style={{ color: 'var(--pq-ink-2)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase' }}
+        >
+          ← {business.name} / Lines
+        </Link>
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <div className="pq-eyebrow mb-4">
+              <span className="pq-dot" />
+              Live · {lineData.name}
+            </div>
+            <h1
+              style={{
+                fontSize: 48,
+                fontWeight: 600,
+                letterSpacing: '-0.03em',
+                color: 'var(--pq-ink-0)',
+                lineHeight: 1.02
+              }}
+            >
+              {lineData.name}
+            </h1>
+          </div>
+          <NextInLineButton
+            businessId={id}
+            lineId={lineId}
+            disabled={waitingPositions.length === 0}
+          />
         </div>
       </div>
-      <div className="max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
-        <div className="mt-8 mb-4 flex items-center justify-between gap-4 flex-wrap">
-          <Link
-            href={`/businesses/${id}/lines`}
-            className="px-4 py-2 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 hover:border-zinc-600 transition-colors inline-block"
-          >
-            ← Back to Lines
-          </Link>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-zinc-300">
-              <span className="font-medium text-white">Current position:</span>{' '}
-              {lineData.position ? (
-                <span className="text-green-400">#{lineData.position}</span>
-              ) : (
-                <span className="text-zinc-400">None called yet</span>
-              )}
-            </div>
-            <NextInLineButton
-              businessId={id}
-              lineId={lineId}
-              disabled={waitingPositions.length === 0}
-            />
-          </div>
-        </div>
 
-        {/* Public QR code to join this line */}
-        <div className="mb-8 grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-center">
-          <div className="text-sm text-zinc-300 max-w-xl">
-            <h2 className="text-lg font-semibold text-white mb-1">
-              Let customers join themselves
-            </h2>
-            <p className="text-zinc-400">
-              Display this QR code at your location. Customers can scan it to open a
-              simple page where they enter their name and phone number to join this
-              line.
-            </p>
-            <p className="mt-3 text-xs text-zinc-500 break-all">
-              Join URL:{' '}
-              <Link href={publicJoinUrl} className="underline hover:text-zinc-300">
-                {publicJoinUrl}
-              </Link>
-            </p>
-          </div>
-          <div className="flex justify-start md:justify-end">
-            <div className="inline-flex flex-col items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950/70 p-4">
-              <img
-                src={qrImageSrc}
-                alt="QR code to join this line"
-                className="w-40 h-40"
-              />
-              <p className="text-xs text-zinc-400 text-center">
-                Scan to join <span className="font-semibold text-zinc-100">{lineData.name}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick status summary for current and last called */}
-        {(currentPosition || lastCalledPosition) && (
-          <div className="mb-6 text-sm text-zinc-300 space-y-1">
-            {currentPosition && (
-              <p>
-                <span className="font-medium text-white">Currently serving:</span>{' '}
-                <span className="text-green-400">
-                  #{currentPosition.position} {currentPosition.name && `- ${currentPosition.name}`}
-                </span>
-              </p>
-            )}
-            {lastCalledPosition && (
-              <p>
-                <span className="font-medium text-white">Last called:</span>{' '}
-                <span className="text-zinc-200">
-                  #{lastCalledPosition.position}{' '}
-                  {lastCalledPosition.name && `- ${lastCalledPosition.name}`}{' '}
-                  <span className="text-xs uppercase tracking-wide text-zinc-400">
-                    ({lastCalledPosition.status})
-                  </span>
-                </span>
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Currently Called Position */}
-        {currentPosition && (
-          <div className="mb-8 p-6 border-2 border-green-500 rounded-md bg-green-900/20">
-            <h2 className="text-2xl font-bold text-green-400 mb-4">
-              Currently Serving
-            </h2>
-            <div className="bg-zinc-900 p-4 rounded-md">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-3xl font-bold text-white">
-                    Position #{currentPosition.position}
-                  </p>
-                  <p className="text-xl text-zinc-300 mt-2">{currentPosition.name}</p>
-                  {currentPosition.phone && (
-                    <p className="text-zinc-400 mt-1">{currentPosition.phone}</p>
-                  )}
+      {/* Now-serving ticket display */}
+      <div className="max-w-7xl mx-auto px-6 relative">
+        <div
+          className="pq-card relative overflow-hidden"
+          style={{
+            padding: 0,
+            background:
+              'linear-gradient(135deg, oklch(0.88 0.19 125 / 0.04) 0%, rgba(10,11,13,0) 55%), linear-gradient(180deg, var(--pq-surface-1) 0%, var(--pq-surface-0) 100%)'
+          }}
+        >
+          <div
+            className="absolute inset-0 pointer-events-none"
+            aria-hidden="true"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 85% 30%, oklch(0.88 0.19 125 / 0.10), transparent 45%)'
+            }}
+          />
+          <div className="relative grid md:grid-cols-[2fr_1fr] gap-0">
+            <div className="p-8 md:p-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="pq-eyebrow">
+                  <span className="pq-dot" />
+                  Now serving
                 </div>
-                <div className="text-right">
-                  <span className="inline-block px-3 py-1 bg-green-600 text-white text-sm font-medium rounded">
-                    CALLED
-                  </span>
+                <div className="pq-chip pq-mono">
+                  {waitingPositions.length} waiting
                 </div>
               </div>
+              <div
+                className="pq-ticket-number"
+                style={{
+                  fontSize: 'clamp(96px, 14vw, 200px)',
+                  color: currentPosition ? 'var(--pq-accent)' : 'var(--pq-ink-3)',
+                  lineHeight: 0.9,
+                  fontWeight: 500,
+                  textShadow: currentPosition ? '0 0 60px oklch(0.88 0.19 125 / 0.3)' : 'none'
+                }}
+              >
+                {currentPosition ? `#${fmtNum(currentPosition.position)}` : '—'}
+              </div>
+              {currentPosition ? (
+                <div className="mt-6 flex items-end justify-between gap-4 flex-wrap">
+                  <div>
+                    <div className="pq-label" style={{ marginBottom: 4 }}>Customer</div>
+                    <div style={{ fontSize: 24, color: 'var(--pq-ink-0)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                      {currentPosition.name}
+                    </div>
+                    {currentPosition.phone && (
+                      <div className="pq-mono mt-1" style={{ color: 'var(--pq-ink-3)', fontSize: 13 }}>
+                        {currentPosition.phone}
+                      </div>
+                    )}
+                  </div>
+                  <div className="pq-chip pq-chip-live">● Called</div>
+                </div>
+              ) : (
+                <p className="mt-6" style={{ color: 'var(--pq-ink-2)', fontSize: 15 }}>
+                  No one is currently being served. Click{' '}
+                  <span className="pq-mono" style={{ color: 'var(--pq-ink-1)' }}>Call next</span>{' '}
+                  above to bring the first person forward.
+                </p>
+              )}
+            </div>
+
+            {/* Stats column */}
+            <div
+              className="p-8 md:p-10 border-t md:border-t-0 md:border-l"
+              style={{ borderColor: 'var(--pq-line)' }}
+            >
+              <div className="pq-label mb-3">Session stats</div>
+              <dl className="grid gap-5">
+                <div>
+                  <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+                    Waiting
+                  </dt>
+                  <dd className="pq-ticket-number" style={{ fontSize: 40, color: 'var(--pq-ink-0)' }}>
+                    {fmtNum(waitingPositions.length)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+                    Served
+                  </dt>
+                  <dd className="pq-ticket-number" style={{ fontSize: 40, color: 'var(--pq-ink-1)' }}>
+                    {fmtNum(totalServed)}
+                  </dd>
+                </div>
+                {lastCalledPosition && (
+                  <div>
+                    <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+                      Last called
+                    </dt>
+                    <dd style={{ color: 'var(--pq-ink-1)', fontSize: 14, marginTop: 4 }}>
+                      #{fmtNum(lastCalledPosition.position)} · {lastCalledPosition.name}
+                    </dd>
+                  </div>
+                )}
+              </dl>
             </div>
           </div>
-        )}
-
-        {/* Add Position Form */}
-        <div className="mb-8">
-          <AddPositionForm businessId={id} lineId={lineId} />
         </div>
+      </div>
 
-        {/* Waiting Positions */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Waiting Positions ({waitingPositions.length})
-          </h2>
-          {waitingPositions.length === 0 ? (
-            <p className="text-zinc-400">No one is currently waiting.</p>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {waitingPositions.map((position: any) => (
-                <div
-                  key={position.id}
-                  className="border rounded-md border-zinc-700 bg-zinc-900 p-4"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="text-xl font-semibold text-white">
-                        Position #{position.position}
-                      </p>
-                      <p className="text-zinc-300 mt-1">{position.name}</p>
-                      {position.phone && (
-                        <p className="text-zinc-400 text-sm mt-1">{position.phone}</p>
-                      )}
-                    </div>
-                    <span className="inline-block px-2 py-1 bg-yellow-600 text-white text-xs font-medium rounded">
-                      WAITING
-                    </span>
-                  </div>
-                  <PositionActions
-                    position={position}
-                    businessId={id}
-                    lineId={lineId}
-                  />
-                </div>
-              ))}
+      {/* Two-column: queue + QR/add */}
+      <div className="max-w-7xl mx-auto px-6 relative mt-8 pb-24">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          {/* Queue stream */}
+          <div className="pq-card p-6 md:p-8">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <div className="pq-eyebrow mb-2">Queue</div>
+                <h2 style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--pq-ink-0)' }}>
+                  Waiting · {waitingPositions.length}
+                </h2>
+              </div>
             </div>
-          )}
-        </div>
 
-        {/* Past Called Positions */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-white mb-4">
-            Past Called Positions ({pastCalledPositions.length})
-          </h2>
-          {pastCalledPositions.length === 0 ? (
-            <p className="text-zinc-400">No positions have been called yet.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-zinc-700">
-                    <th className="text-left p-3 text-zinc-300 font-medium">Position</th>
-                    <th className="text-left p-3 text-zinc-300 font-medium">Name</th>
-                    <th className="text-left p-3 text-zinc-300 font-medium">Phone</th>
-                    <th className="text-left p-3 text-zinc-300 font-medium">Status</th>
-                    <th className="text-left p-3 text-zinc-300 font-medium">Called At</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pastCalledPositions.map((position: any) => (
-                    <tr
-                      key={position.id}
-                      className="border-b border-zinc-800 hover:bg-zinc-900"
-                    >
-                      <td className="p-3 text-white font-medium">
-                        #{position.position}
-                      </td>
-                      <td className="p-3 text-zinc-300">{position.name}</td>
-                      <td className="p-3 text-zinc-400">{position.phone || '-'}</td>
-                      <td className="p-3">
-                        <span
-                          className={`inline-block px-2 py-1 text-xs font-medium rounded ${
-                            position.status === 'called'
-                              ? 'bg-blue-600 text-white'
-                              : 'bg-gray-600 text-white'
-                          }`}
+            {waitingPositions.length === 0 ? (
+              <div
+                className="text-center py-14 rounded-xl"
+                style={{ border: '1px dashed var(--pq-line-strong)', background: 'var(--pq-surface-0)' }}
+              >
+                <div className="pq-eyebrow mb-2" style={{ justifyContent: 'center' }}>Empty queue</div>
+                <p style={{ color: 'var(--pq-ink-2)', fontSize: 14 }}>
+                  No one is waiting. Share the QR or add someone manually.
+                </p>
+              </div>
+            ) : (
+              <ul className="flex flex-col" style={{ gap: 1 }}>
+                {waitingPositions.map((position: any, idx: number) => (
+                  <li
+                    key={position.id}
+                    className="pq-queue-row"
+                    style={{ opacity: idx === 0 ? 1 : 1 - idx * 0.03 }}
+                  >
+                    <div className="flex items-center gap-5">
+                      <div
+                        className="pq-mono flex-shrink-0"
+                        style={{
+                          fontSize: 20,
+                          color: idx === 0 ? 'var(--pq-accent)' : 'var(--pq-ink-2)',
+                          fontWeight: 500,
+                          minWidth: 56,
+                          letterSpacing: '-0.01em'
+                        }}
+                      >
+                        #{fmtNum(position.position)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div
+                          className="truncate"
+                          style={{
+                            fontSize: 15,
+                            color: 'var(--pq-ink-0)',
+                            fontWeight: 500,
+                            letterSpacing: '-0.005em'
+                          }}
                         >
-                          {position.status === 'called' ? 'CALLED' : 'SKIPPED'}
-                        </span>
-                      </td>
-                      <td className="p-3 text-zinc-400 text-sm">
-                        {new Date(position.created_at).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                          {position.name}
+                        </div>
+                        {position.phone && (
+                          <div className="pq-mono truncate" style={{ color: 'var(--pq-ink-3)', fontSize: 12, marginTop: 2 }}>
+                            {position.phone}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {idx === 0 && <span className="pq-chip pq-chip-live">Next</span>}
+                        <PositionActions
+                          position={position}
+                          businessId={id}
+                          lineId={lineId}
+                        />
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {/* History */}
+            {pastCalledPositions.length > 0 && (
+              <details className="mt-8 group">
+                <summary
+                  className="pq-mono cursor-pointer flex items-center gap-2"
+                  style={{
+                    fontSize: 11,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    color: 'var(--pq-ink-2)',
+                    userSelect: 'none'
+                  }}
+                >
+                  <span className="pq-mono group-open:rotate-90 transition-transform" style={{ display: 'inline-block' }}>▸</span>
+                  History · {pastCalledPositions.length}
+                </summary>
+                <div className="mt-4 overflow-x-auto">
+                  <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--pq-line)' }}>
+                        {['Position', 'Name', 'Phone', 'Status', 'Time'].map((h) => (
+                          <th
+                            key={h}
+                            className="pq-mono text-left py-3 px-2"
+                            style={{
+                              fontSize: 10.5,
+                              letterSpacing: '0.14em',
+                              textTransform: 'uppercase',
+                              color: 'var(--pq-ink-3)',
+                              fontWeight: 500
+                            }}
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pastCalledPositions.map((position: any) => (
+                        <tr
+                          key={position.id}
+                          style={{ borderBottom: '1px solid var(--pq-line)' }}
+                        >
+                          <td className="pq-mono py-3 px-2" style={{ color: 'var(--pq-ink-1)', fontSize: 13 }}>
+                            #{fmtNum(position.position)}
+                          </td>
+                          <td className="py-3 px-2" style={{ color: 'var(--pq-ink-1)', fontSize: 13 }}>
+                            {position.name}
+                          </td>
+                          <td className="pq-mono py-3 px-2" style={{ color: 'var(--pq-ink-3)', fontSize: 12 }}>
+                            {position.phone || '—'}
+                          </td>
+                          <td className="py-3 px-2">
+                            <span
+                              className="pq-chip"
+                              style={
+                                position.status === 'called'
+                                  ? { background: 'oklch(0.88 0.19 125 / 0.08)', color: 'var(--pq-accent)', borderColor: 'oklch(0.88 0.19 125 / 0.3)' }
+                                  : { background: 'rgba(255,255,255,0.04)', color: 'var(--pq-ink-3)' }
+                              }
+                            >
+                              {position.status}
+                            </span>
+                          </td>
+                          <td className="pq-mono py-3 px-2" style={{ color: 'var(--pq-ink-3)', fontSize: 12 }}>
+                            {new Date(position.created_at).toLocaleTimeString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            )}
+          </div>
+
+          {/* Sidebar: QR + add form */}
+          <div className="flex flex-col gap-6">
+            <div className="pq-card p-6 md:p-8">
+              <div className="pq-eyebrow mb-4">Self-serve</div>
+              <h3 style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.015em', color: 'var(--pq-ink-0)', marginBottom: 4 }}>
+                Let customers join themselves
+              </h3>
+              <p style={{ color: 'var(--pq-ink-2)', fontSize: 13.5, lineHeight: 1.55, marginBottom: 20 }}>
+                Display this QR at your location. Scanning opens a simple form to join.
+              </p>
+              <div
+                className="flex justify-center p-4 rounded-xl"
+                style={{
+                  background: 'var(--pq-surface-0)',
+                  border: '1px solid var(--pq-line)'
+                }}
+              >
+                <img
+                  src={qrImageSrc}
+                  alt="QR code to join this line"
+                  className="w-48 h-48"
+                  style={{ borderRadius: 8 }}
+                />
+              </div>
+              <div className="mt-4">
+                <div className="pq-label" style={{ marginBottom: 6 }}>Direct URL</div>
+                <Link
+                  href={publicJoinUrl}
+                  className="pq-mono block truncate"
+                  style={{
+                    color: 'var(--pq-accent)',
+                    fontSize: 12,
+                    textDecoration: 'none'
+                  }}
+                  target="_blank"
+                >
+                  {publicJoinUrl}
+                </Link>
+              </div>
+              <Link
+                href={`/businesses/${id}/lines/${lineId}/qr`}
+                target="_blank"
+                className="pq-btn pq-btn-ghost mt-4 w-full justify-center"
+              >
+                Open fullscreen display →
+              </Link>
             </div>
-          )}
+
+            <AddPositionForm businessId={id} lineId={lineId} />
+          </div>
         </div>
       </div>
     </section>
   );
 }
-

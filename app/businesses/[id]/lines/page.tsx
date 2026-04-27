@@ -17,12 +17,11 @@ export default async function BusinessLinesPage({
 
   const { id } = await params;
   const business = await getBusiness(supabase, id);
-  
+
   if (!business) {
     return redirect('/businesses');
   }
 
-  // Verify user owns the business
   if (business.user_id !== user.id) {
     return redirect('/businesses');
   }
@@ -30,68 +29,110 @@ export default async function BusinessLinesPage({
   const lines = await getLinesByBusiness(supabase, id);
 
   return (
-    <section className="mb-32 bg-black">
-      <div className="max-w-6xl px-4 py-8 mx-auto sm:px-6 sm:pt-24 lg:px-8">
-        <div className="sm:align-center sm:flex sm:flex-col">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Lines for {business.name}
-          </h1>
-          <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            Manage your virtual waiting lines
-          </p>
+    <section className="relative">
+      <div className="absolute inset-x-0 top-0 h-[320px] pq-grid-bg pointer-events-none" aria-hidden="true" />
+      <div className="max-w-6xl mx-auto px-6 pt-16 sm:pt-20 pb-6 relative">
+        <Link href="/businesses" className="pq-mono inline-flex items-center gap-2 mb-6" style={{ color: 'var(--pq-ink-2)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          ← All businesses
+        </Link>
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          <div>
+            <div className="pq-eyebrow mb-4">Lines / {business.name}</div>
+            <h1
+              style={{
+                fontSize: 44,
+                fontWeight: 600,
+                letterSpacing: '-0.03em',
+                color: 'var(--pq-ink-0)',
+                lineHeight: 1.02
+              }}
+            >
+              {business.name}
+            </h1>
+            <p className="mt-3" style={{ color: 'var(--pq-ink-2)', fontSize: 16 }}>
+              Manage virtual waiting lines for this business.
+            </p>
+          </div>
+          <Link href={`/businesses/${id}/lines/new`} className="pq-btn pq-btn-primary">
+            + New line
+          </Link>
         </div>
       </div>
-      <div className="max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
-        <div className="mt-8 flex justify-between items-center">
-          <Link
-            href="/businesses"
-            className="px-4 py-2 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
-          >
-            ← Back to Businesses
-          </Link>
-          <Link
-            href={`/businesses/${id}/lines/new`}
-            className="px-4 py-2 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
-          >
-            + Add New Line
-          </Link>
-        </div>
+
+      <div className="max-w-6xl mx-auto px-6 relative pb-24">
         {lines.length === 0 ? (
-          <div className="mt-8 text-center">
-            <p className="text-zinc-400 text-lg mb-4">
-              No lines found. Create your first line to get started.
+          <div className="pq-card p-12 text-center mt-8">
+            <div className="pq-eyebrow mb-4" style={{ justifyContent: 'center' }}>
+              Empty
+            </div>
+            <p style={{ color: 'var(--pq-ink-1)', fontSize: 18 }}>
+              No lines yet. Create your first line to start queuing people.
             </p>
             <Link
               href={`/businesses/${id}/lines/new`}
-              className="inline-block px-6 py-3 text-sm font-medium text-white bg-zinc-800 border border-zinc-700 rounded-md hover:bg-zinc-700 hover:border-zinc-600 transition-colors"
+              className="pq-btn pq-btn-primary mt-6 inline-flex"
             >
-              Create Your First Line
+              Create your first line →
             </Link>
           </div>
         ) : (
-          <div className="grid gap-6 mt-8 md:grid-cols-2 lg:grid-cols-3">
-            {lines.map((line: any) => (
+          <div className="grid gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3">
+            {lines.map((line: any, idx: number) => (
               <Link
                 key={line.id}
                 href={`/businesses/${id}/lines/${line.id}`}
-                className="w-full border rounded-md border-zinc-700 bg-zinc-900 hover:border-zinc-600 transition-colors block"
+                className="pq-card pq-card-hover p-5 flex flex-col group"
               >
-                <div className="px-5 py-4">
-                  <h3 className="mb-1 text-xl font-semibold text-white">
-                    {line.name || `Line ${line.id?.slice(0, 8) || 'N/A'}`}
-                  </h3>
-                  <div className="text-xs text-zinc-500 mt-2">
-                    {line.created_at && (
-                      <p>
-                        Created:{' '}
-                        {new Date(line.created_at).toLocaleDateString()}
-                      </p>
-                    )}
-                    {line.position > 0 && (
-                      <p className="mt-1">
-                        Current Position: {line.position}
-                      </p>
-                    )}
+                <div className="flex items-center justify-between">
+                  <div
+                    className="pq-mono"
+                    style={{
+                      color: 'var(--pq-ink-3)',
+                      fontSize: 10.5,
+                      letterSpacing: '0.16em',
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    LINE · {String(idx + 1).padStart(3, '0')}
+                  </div>
+                  {line.position > 0 ? (
+                    <div className="pq-chip pq-chip-live">Live</div>
+                  ) : (
+                    <div className="pq-chip">Idle</div>
+                  )}
+                </div>
+                <h3
+                  className="mt-4"
+                  style={{
+                    fontSize: 20,
+                    fontWeight: 600,
+                    color: 'var(--pq-ink-0)',
+                    letterSpacing: '-0.015em'
+                  }}
+                >
+                  {line.name || `Line ${line.id?.slice(0, 8) || 'N/A'}`}
+                </h3>
+                <div className="pq-divider my-4" />
+                <div className="flex items-end justify-between">
+                  <div>
+                    <div className="pq-label" style={{ marginBottom: 4 }}>Now serving</div>
+                    <div
+                      className="pq-ticket-number"
+                      style={{ fontSize: 32, color: line.position > 0 ? 'var(--pq-accent)' : 'var(--pq-ink-3)' }}
+                    >
+                      {line.position > 0 ? `#${String(line.position).padStart(3, '0')}` : '—'}
+                    </div>
+                  </div>
+                  <div
+                    className="pq-mono"
+                    style={{
+                      color: 'var(--pq-ink-3)',
+                      fontSize: 10.5,
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase'
+                    }}
+                  >
+                    {line.created_at && new Date(line.created_at).toLocaleDateString()}
                   </div>
                 </div>
               </Link>
@@ -102,4 +143,3 @@ export default async function BusinessLinesPage({
     </section>
   );
 }
-

@@ -1,19 +1,48 @@
 .root {
-  @apply sticky top-0 bg-black z-40 transition-all duration-150 h-16 md:h-20;
+  @apply sticky top-0 z-40 transition-all duration-150 h-16 md:h-20;
+  background: rgba(7, 7, 10, 0.72);
+  backdrop-filter: saturate(140%) blur(12px);
+  -webkit-backdrop-filter: saturate(140%) blur(12px);
+  border-bottom: 1px solid var(--pq-border);
 }
 
 .link {
-  @apply inline-flex items-center leading-6 font-medium transition ease-in-out duration-75 cursor-pointer text-zinc-200 rounded-md p-1;
+  @apply inline-flex items-center leading-6 transition ease-in-out duration-150 cursor-pointer rounded-md px-3 py-1.5;
+  font-size: 13px;
+  color: var(--pq-ink-2);
+  font-weight: 500;
 }
 
 .link:hover {
-  @apply text-zinc-100;
+  color: var(--pq-ink-0);
+  background: var(--pq-surface-1);
 }
 
 .link:focus {
-  @apply outline-none text-zinc-100 ring-2 ring-pink-500 ring-opacity-50;
+  outline: none;
+  color: var(--pq-ink-0);
+  box-shadow: 0 0 0 2px var(--pq-bg), 0 0 0 3.5px var(--pq-accent);
+}
+
+.linkActive {
+  color: var(--pq-ink-0);
+  background: var(--pq-surface-1);
 }
 
 .logo {
-  @apply cursor-pointer rounded-full transform duration-100 ease-in-out;
+  @apply cursor-pointer inline-flex items-center gap-2;
+  color: var(--pq-ink-0);
+}
+
+.logoMark {
+  width: 22px;
+  height: 22px;
+  position: relative;
+  display: inline-block;
+}
+
+.logoWord {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.015em;
 }

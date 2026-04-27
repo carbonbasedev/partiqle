@@ -1,7 +1,23 @@
 .root {
-  @apply bg-black py-2 px-3 w-full appearance-none transition duration-150 ease-in-out border border-zinc-500 text-zinc-200;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--pq-surface-0);
+  color: var(--pq-ink-0);
+  border: 1px solid var(--pq-border);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  appearance: none;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.root::placeholder {
+  color: var(--pq-ink-3);
 }
 
 .root:focus {
-  @apply outline-none;
+  outline: none;
+  border-color: var(--pq-accent);
+  background: var(--pq-surface-1);
+  box-shadow: 0 0 0 3px oklch(0.88 0.19 125 / 0.15);
 }

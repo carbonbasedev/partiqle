@@ -17,7 +17,6 @@ export default function EmailForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
-    // Check if the new email is the same as the old email
     if (e.currentTarget.newEmail.value === userEmail) {
       e.preventDefault();
       setIsSubmitting(false);
@@ -29,12 +28,12 @@ export default function EmailForm({
 
   return (
     <Card
-      title="Your Email"
-      description="Please enter the email address you want to use to login."
+      title="Your email"
+      description="The email address used to sign into your account."
       footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">
-            We will email you to verify the change.
+        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center gap-3">
+          <p className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+            We&apos;ll email to verify the change
           </p>
           <Button
             variant="slim"
@@ -42,17 +41,18 @@ export default function EmailForm({
             form="emailForm"
             loading={isSubmitting}
           >
-            Update Email
+            Update email
           </Button>
         </div>
       }
     >
-      <div className="mt-8 mb-4 text-xl font-semibold">
+      <div className="mt-6 mb-2">
         <form id="emailForm" onSubmit={(e) => handleSubmit(e)}>
           <input
             type="text"
             name="newEmail"
-            className="w-1/2 p-3 rounded-md bg-zinc-800"
+            className="pq-input"
+            style={{ maxWidth: 380 }}
             defaultValue={userEmail ?? ''}
             placeholder="Your email"
             maxLength={64}

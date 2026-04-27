@@ -7,7 +7,7 @@ import { getURL } from '@/utils/helpers';
 import 'styles/main.css';
 
 const title = 'Partiqle';
-const description = 'Restore time';
+const description = 'Restore time. Virtual queues for the places people wait.';
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
@@ -22,7 +22,19 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
-      <body className="bg-black">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>
         <Navbar />
         <main
           id="skip"

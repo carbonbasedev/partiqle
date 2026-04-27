@@ -57,8 +57,7 @@ export async function joinLinePublic(formData: FormData) {
     .eq('line_id', lineId)
     .order('position', { ascending: false })
     .limit(1)
-    .returns<Pick<Database['public']['Tables']['positions']['Row'], 'position'>>()
-    .single();
+    .maybeSingle();
 
   const lastPosition = lastPositionRaw as Pick<Database['public']['Tables']['positions']['Row'], 'position'> | null;
   const nextPosition = lastPosition?.position ? Number(lastPosition.position) + 1 : 1;

@@ -13,7 +13,6 @@ export default function NameForm({ userName }: { userName: string }) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
-    // Check if the new name is the same as the old name
     if (e.currentTarget.fullName.value === userName) {
       e.preventDefault();
       setIsSubmitting(false);
@@ -25,28 +24,31 @@ export default function NameForm({ userName }: { userName: string }) {
 
   return (
     <Card
-      title="Your Name"
-      description="Please enter your full name, or a display name you are comfortable with."
+      title="Your name"
+      description="Your full name, or a display name you're comfortable with."
       footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">64 characters maximum</p>
+        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center gap-3">
+          <p className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+            64 characters maximum
+          </p>
           <Button
             variant="slim"
             type="submit"
             form="nameForm"
             loading={isSubmitting}
           >
-            Update Name
+            Update name
           </Button>
         </div>
       }
     >
-      <div className="mt-8 mb-4 text-xl font-semibold">
+      <div className="mt-6 mb-2">
         <form id="nameForm" onSubmit={(e) => handleSubmit(e)}>
           <input
             type="text"
             name="fullName"
-            className="w-1/2 p-3 rounded-md bg-zinc-800"
+            className="pq-input"
+            style={{ maxWidth: 380 }}
             defaultValue={userName}
             placeholder="Your name"
             maxLength={64}

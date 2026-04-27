@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
 import { getUser, getBusiness } from '@/utils/supabase/queries';
 import AddLineForm from '@/components/ui/LineForms/AddLineForm';
@@ -22,27 +23,36 @@ export default async function NewLinePage({
     return redirect('/businesses');
   }
 
-  // Verify user owns the business
   if (business.user_id !== user.id) {
     return redirect('/businesses');
   }
 
   return (
-    <section className="mb-32 bg-black">
-      <div className="max-w-6xl px-4 py-8 mx-auto sm:px-6 sm:pt-24 lg:px-8">
-        <div className="sm:align-center sm:flex sm:flex-col">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Add New Line
-          </h1>
-          <p className="max-w-2xl m-auto mt-5 text-xl text-zinc-200 sm:text-center sm:text-2xl">
-            Create a new virtual waiting line for {business.name}
-          </p>
-        </div>
+    <section className="relative">
+      <div className="absolute inset-x-0 top-0 h-[300px] pq-grid-bg pointer-events-none" aria-hidden="true" />
+      <div className="max-w-4xl mx-auto px-6 pt-16 sm:pt-20 pb-6 relative">
+        <Link href={`/businesses/${id}/lines`} className="pq-mono inline-flex items-center gap-2 mb-6" style={{ color: 'var(--pq-ink-2)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+          ← Back to lines
+        </Link>
+        <div className="pq-eyebrow mb-4">New line · {business.name}</div>
+        <h1
+          style={{
+            fontSize: 40,
+            fontWeight: 600,
+            letterSpacing: '-0.03em',
+            color: 'var(--pq-ink-0)',
+            lineHeight: 1.05
+          }}
+        >
+          Create a line
+        </h1>
+        <p className="mt-3" style={{ color: 'var(--pq-ink-2)', fontSize: 15, maxWidth: 520 }}>
+          Pick a name that reflects what people are queueing for — a counter, service, or check-in.
+        </p>
       </div>
-      <div className="max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-6 relative pb-24">
         <AddLineForm businessId={id} />
       </div>
     </section>
   );
 }
-

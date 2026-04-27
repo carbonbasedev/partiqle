@@ -23,12 +23,20 @@ export default function PublicJoinLineForm({ lineId }: PublicJoinLineFormProps) 
 
   return (
     <Card
-      title="Join this line"
-      description="Enter your details to receive a position in the queue."
+      title="Take a ticket"
+      description="Enter your name. Phone is optional but helps staff reach you."
       footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0 text-xs text-zinc-400">
-            You&apos;ll be added to the end of the line.
+        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center gap-3">
+          <p
+            className="pq-mono"
+            style={{
+              fontSize: 11,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: 'var(--pq-ink-3)'
+            }}
+          >
+            No signup required
           </p>
           <Button
             variant="slim"
@@ -36,39 +44,36 @@ export default function PublicJoinLineForm({ lineId }: PublicJoinLineFormProps) 
             form="publicJoinLineForm"
             loading={isSubmitting}
           >
-            Join Line
+            Join line →
           </Button>
         </div>
       }
     >
-      <div className="mt-4 mb-4">
+      <div className="mt-6 mb-2">
         <form id="publicJoinLineForm" onSubmit={(e) => handleSubmit(e)}>
           <input type="hidden" name="lineId" value={lineId} />
-          <div className="grid gap-4">
-            <div className="grid gap-1">
-              <label htmlFor="name" className="text-sm font-medium text-zinc-300">
-                Name *
-              </label>
+          <div className="grid gap-5">
+            <div>
+              <label htmlFor="name" className="pq-label">Your name *</label>
               <input
                 id="name"
                 type="text"
                 name="name"
-                className="w-full p-3 rounded-md bg-zinc-800 text-white placeholder-zinc-500 border border-zinc-700 focus:border-zinc-600 focus:outline-none"
-                placeholder="Your name"
+                className="pq-input"
+                placeholder="First name, or first + last initial"
                 required
+                autoFocus
                 maxLength={255}
               />
             </div>
-            <div className="grid gap-1">
-              <label htmlFor="phone" className="text-sm font-medium text-zinc-300">
-                Phone Number (Optional)
-              </label>
+            <div>
+              <label htmlFor="phone" className="pq-label">Phone (optional)</label>
               <input
                 id="phone"
                 type="tel"
                 name="phone"
-                className="w-full p-3 rounded-md bg-zinc-800 text-white placeholder-zinc-500 border border-zinc-700 focus:border-zinc-600 focus:outline-none"
-                placeholder="Your phone number"
+                className="pq-input"
+                placeholder="+1 555 123 4567"
                 maxLength={20}
               />
             </div>
@@ -78,5 +83,3 @@ export default function PublicJoinLineForm({ lineId }: PublicJoinLineFormProps) 
     </Card>
   );
 }
-
-

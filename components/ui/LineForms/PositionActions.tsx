@@ -1,6 +1,5 @@
 'use client';
 
-import Button from '@/components/ui/Button';
 import { callPosition, skipPosition } from '@/utils/supabase/server-actions/positions';
 import { handleRequest } from '@/utils/supabase/auth-helpers/client';
 import { useRouter } from 'next/navigation';
@@ -34,34 +33,31 @@ export default function PositionActions({ position, businessId, lineId }: Positi
   }
 
   return (
-    <div className="flex gap-2 mt-2">
+    <div className="flex gap-2 items-center">
       <form onSubmit={handleCall}>
         <input type="hidden" name="positionId" value={position.id} />
         <input type="hidden" name="lineId" value={lineId} />
         <input type="hidden" name="businessId" value={businessId} />
-        <Button
-          variant="slim"
+        <button
           type="submit"
-          loading={isCalling}
-          className="text-xs px-3 py-1"
+          disabled={isCalling}
+          className="pq-row-btn pq-row-btn-primary"
         >
-          Call
-        </Button>
+          {isCalling ? '…' : 'Call'}
+        </button>
       </form>
       <form onSubmit={handleSkip}>
         <input type="hidden" name="positionId" value={position.id} />
         <input type="hidden" name="lineId" value={lineId} />
         <input type="hidden" name="businessId" value={businessId} />
-        <Button
-          variant="slim"
+        <button
           type="submit"
-          loading={isSkipping}
-          className="text-xs px-3 py-1 bg-zinc-700 hover:bg-zinc-600"
+          disabled={isSkipping}
+          className="pq-row-btn"
         >
-          Skip
-        </Button>
+          {isSkipping ? '…' : 'Skip'}
+        </button>
       </form>
     </div>
   );
 }
-

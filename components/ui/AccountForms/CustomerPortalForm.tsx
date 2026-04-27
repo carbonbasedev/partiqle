@@ -46,15 +46,17 @@ export default function CustomerPortalForm({ subscription }: Props) {
 
   return (
     <Card
-      title="Your Plan"
+      title="Your plan"
       description={
         subscription
-          ? `You are currently on the ${subscription?.prices?.products?.name} plan.`
+          ? `You're on the ${subscription?.prices?.products?.name} plan.`
           : 'You are not currently subscribed to any plan.'
       }
       footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">Manage your subscription on Stripe.</p>
+        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center gap-3">
+          <p className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+            Managed via Stripe
+          </p>
           <Button
             variant="slim"
             onClick={handleStripePortalRequest}
@@ -65,11 +67,23 @@ export default function CustomerPortalForm({ subscription }: Props) {
         </div>
       }
     >
-      <div className="mt-8 mb-4 text-xl font-semibold">
+      <div className="mt-6 mb-2 flex items-baseline gap-2">
         {subscription ? (
-          `${subscriptionPrice}/${subscription?.prices?.interval}`
+          <>
+            <span className="pq-ticket-number" style={{ fontSize: 40, color: 'var(--pq-ink-0)' }}>
+              {subscriptionPrice}
+            </span>
+            <span className="pq-mono" style={{ color: 'var(--pq-ink-3)', fontSize: 12, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              /{subscription?.prices?.interval}
+            </span>
+          </>
         ) : (
-          <Link href="/">Choose your plan</Link>
+          <Link
+            href="/"
+            className="pq-btn pq-btn-primary"
+          >
+            Choose a plan →
+          </Link>
         )}
       </div>
     </Card>

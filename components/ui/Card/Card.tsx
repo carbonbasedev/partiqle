@@ -9,14 +9,38 @@ interface Props {
 
 export default function Card({ title, description, footer, children }: Props) {
   return (
-    <div className="w-full max-w-3xl m-auto my-8 border rounded-md p border-zinc-700">
-      <div className="px-5 py-4">
-        <h3 className="mb-1 text-2xl font-medium">{title}</h3>
-        <p className="text-zinc-300">{description}</p>
+    <div
+      className="w-full max-w-3xl m-auto my-8 pq-card overflow-hidden"
+    >
+      <div className="px-6 py-5">
+        <div className="pq-eyebrow mb-3">Partiqle</div>
+        <h3
+          className="text-2xl"
+          style={{
+            fontWeight: 600,
+            letterSpacing: '-0.02em',
+            color: 'var(--pq-ink-0)'
+          }}
+        >
+          {title}
+        </h3>
+        {description && (
+          <p className="mt-2" style={{ color: 'var(--pq-ink-2)', fontSize: 14 }}>
+            {description}
+          </p>
+        )}
         {children}
       </div>
       {footer && (
-        <div className="p-4 border-t rounded-b-md border-zinc-700 bg-zinc-900 text-zinc-500">
+        <div
+          className="px-6 py-4"
+          style={{
+            borderTop: '1px solid var(--pq-border)',
+            background: 'var(--pq-surface-0)',
+            color: 'var(--pq-ink-2)',
+            fontSize: 13
+          }}
+        >
           {footer}
         </div>
       )}

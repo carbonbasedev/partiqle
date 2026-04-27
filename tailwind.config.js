@@ -18,7 +18,31 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', ...fontFamily.sans]
+        sans: ['var(--font-sans)', ...fontFamily.sans],
+        mono: ['var(--font-mono)', ...fontFamily.mono]
+      },
+      colors: {
+        pq: {
+          bg: 'var(--pq-bg)',
+          surface: {
+            0: 'var(--pq-surface-0)',
+            1: 'var(--pq-surface-1)',
+            2: 'var(--pq-surface-2)',
+            3: 'var(--pq-surface-3)'
+          },
+          border: 'var(--pq-border)',
+          accent: 'var(--pq-accent)',
+          violet: 'var(--pq-violet)',
+          amber: 'var(--pq-amber)',
+          rose: 'var(--pq-rose)',
+          ink: {
+            0: 'var(--pq-ink-0)',
+            1: 'var(--pq-ink-1)',
+            2: 'var(--pq-ink-2)',
+            3: 'var(--pq-ink-3)',
+            4: 'var(--pq-ink-4)'
+          }
+        }
       },
       keyframes: {
         'accordion-down': {

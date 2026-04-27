@@ -20,16 +20,17 @@ export default function AddPositionForm({ businessId, lineId }: AddPositionFormP
     setIsSubmitting(true);
     await handleRequest(e, addPosition, router);
     setIsSubmitting(false);
+    (e.target as HTMLFormElement)?.reset();
   };
 
   return (
     <Card
-      title="Add Person to Line"
-      description="Add someone to this waiting line."
+      title="Add walk-in"
+      description="Manually add someone to the end of the queue."
       footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0 text-xs">
-            They will be added to the end of the line.
+        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center gap-3">
+          <p className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+            Added at position N+1
           </p>
           <Button
             variant="slim"
@@ -37,40 +38,36 @@ export default function AddPositionForm({ businessId, lineId }: AddPositionFormP
             form="addPositionForm"
             loading={isSubmitting}
           >
-            Add to Line
+            Add to line
           </Button>
         </div>
       }
     >
-      <div className="mt-4 mb-4">
+      <div className="mt-6 mb-2">
         <form id="addPositionForm" onSubmit={(e) => handleSubmit(e)}>
           <input type="hidden" name="businessId" value={businessId} />
           <input type="hidden" name="lineId" value={lineId} />
           <div className="grid gap-4">
-            <div className="grid gap-1">
-              <label htmlFor="name" className="text-sm font-medium text-zinc-300">
-                Name *
-              </label>
+            <div>
+              <label htmlFor="name" className="pq-label">Name *</label>
               <input
                 id="name"
                 type="text"
                 name="name"
-                className="w-full p-3 rounded-md bg-zinc-800 text-white placeholder-zinc-500 border border-zinc-700 focus:border-zinc-600 focus:outline-none"
+                className="pq-input"
                 placeholder="Person's name"
                 required
                 maxLength={255}
               />
             </div>
-            <div className="grid gap-1">
-              <label htmlFor="phone" className="text-sm font-medium text-zinc-300">
-                Phone Number (Optional)
-              </label>
+            <div>
+              <label htmlFor="phone" className="pq-label">Phone (optional)</label>
               <input
                 id="phone"
                 type="tel"
                 name="phone"
-                className="w-full p-3 rounded-md bg-zinc-800 text-white placeholder-zinc-500 border border-zinc-700 focus:border-zinc-600 focus:outline-none"
-                placeholder="Phone number"
+                className="pq-input"
+                placeholder="+1 555 123 4567"
                 maxLength={20}
               />
             </div>
@@ -80,4 +77,3 @@ export default function AddPositionForm({ businessId, lineId }: AddPositionFormP
     </Card>
   );
 }
-

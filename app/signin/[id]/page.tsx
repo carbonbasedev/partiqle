@@ -7,7 +7,6 @@ import {
   getDefaultSignInView,
   getRedirectMethod
 } from '@/utils/supabase/auth-helpers/settings';
-import Card from '@/components/ui/Card';
 import PasswordSignIn from '@/components/ui/AuthForms/PasswordSignIn';
 import EmailSignIn from '@/components/ui/AuthForms/EmailSignIn';
 import Separator from '@/components/ui/AuthForms/Separator';
@@ -27,14 +26,11 @@ export default async function SignIn({
   const viewTypes = getViewTypes();
   const redirectMethod = getRedirectMethod();
 
-  // Await params and searchParams before accessing their properties
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
 
-  // Declare 'viewProp' and initialize with the default value
   let viewProp: string;
 
-  // Assign url id to 'viewProp' if it's a valid string and ViewTypes includes it
   if (typeof resolvedParams.id === 'string' && viewTypes.includes(resolvedParams.id)) {
     viewProp = resolvedParams.id;
   } else {
@@ -45,9 +41,7 @@ export default async function SignIn({
     return redirect(`/signin/${viewProp}`);
   }
 
-  // Check if the user is already logged in and redirect to the account page if so
   const supabase = await createClient();
-
   const {
     data: { user }
   } = await supabase.auth.getUser();
@@ -58,22 +52,44 @@ export default async function SignIn({
     return redirect('/signin');
   }
 
+  const title =
+    viewProp === 'forgot_password'
+      ? 'Reset password'
+      : viewProp === 'update_password'
+        ? 'Update password'
+        : viewProp === 'signup'
+          ? 'Create account'
+          : 'Sign in';
+
+  const subtitle =
+    viewProp === 'forgot_password'
+      ? 'We\u2019ll send you a link to reset it.'
+      : viewProp === 'update_password'
+        ? 'Choose a new password for your account.'
+        : viewProp === 'signup'
+          ? 'Start managing your first queue in under a minute.'
+          : 'Welcome back.';
+
   return (
-    <div className="flex justify-center height-screen-helper">
-      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
-        <div className="flex justify-center pb-12 ">
-        </div>
-        <Card
-          title={
-            viewProp === 'forgot_password'
-              ? 'Reset Password'
-              : viewProp === 'update_password'
-                ? 'Update Password'
-                : viewProp === 'signup'
-                  ? 'Sign Up'
-                  : 'Sign In'
-          }
+    <div className="min-h-[calc(100vh-6rem)] flex items-center justify-center px-4 py-16 relative overflow-hidden">
+      <div className="absolute inset-0 pq-grid-bg pointer-events-none" aria-hidden="true" />
+      <div className="w-full max-w-md relative">
+        <div className="pq-eyebrow mb-4">Partiqle · Access</div>
+        <h1
+          style={{
+            fontSize: 36,
+            fontWeight: 600,
+            letterSpacing: '-0.03em',
+            color: 'var(--pq-ink-0)',
+            lineHeight: 1.05
+          }}
         >
+          {title}
+        </h1>
+        <p className="mt-3 mb-8" style={{ color: 'var(--pq-ink-2)', fontSize: 15 }}>
+          {subtitle}
+        </p>
+        <div className="pq-card p-6">
           {viewProp === 'password_signin' && (
             <PasswordSignIn
               allowEmail={allowEmail}
@@ -104,11 +120,11 @@ export default async function SignIn({
             viewProp !== 'signup' &&
             allowOauth && (
               <>
-                <Separator text="Third-party sign-in" />
+                <Separator text="Or continue with" />
                 <OauthSignIn />
               </>
             )}
-        </Card>
+        </div>
       </div>
     </div>
   );

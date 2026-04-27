@@ -1,6 +1,5 @@
 'use client';
 
-import Button from '@/components/ui/Button';
 import { callNextPosition } from '@/utils/supabase/server-actions/positions';
 import { handleRequest } from '@/utils/supabase/auth-helpers/client';
 import { useRouter } from 'next/navigation';
@@ -30,17 +29,18 @@ export default function NextInLineButton({
     <form onSubmit={handleCallNext}>
       <input type="hidden" name="lineId" value={lineId} />
       <input type="hidden" name="businessId" value={businessId} />
-      <Button
-        variant="slim"
+      <button
         type="submit"
-        loading={isCallingNext}
-        disabled={disabled}
-        className="px-4 py-2 text-sm"
+        disabled={disabled || isCallingNext}
+        className="pq-btn pq-btn-primary"
       >
-        Call Next in Line
-      </Button>
+        {isCallingNext ? 'Calling…' : (
+          <>
+            Call next
+            <span className="pq-mono" style={{ opacity: 0.6, marginLeft: 8 }}>→</span>
+          </>
+        )}
+      </button>
     </form>
   );
 }
-
-

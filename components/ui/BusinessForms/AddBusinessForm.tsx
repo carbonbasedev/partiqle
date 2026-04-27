@@ -19,12 +19,12 @@ export default function AddBusinessForm() {
 
   return (
     <Card
-      title="Add New Business"
-      description="Create a new business to get started. Fill in the details below."
+      title="Add new business"
+      description="All businesses are tied to your account."
       footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">
-            All businesses are associated with your account.
+        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center gap-3">
+          <p className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
+            You can edit details later
           </p>
           <Button
             variant="slim"
@@ -32,38 +32,34 @@ export default function AddBusinessForm() {
             form="addBusinessForm"
             loading={isSubmitting}
           >
-            Create Business
+            Create business
           </Button>
         </div>
       }
     >
-      <div className="mt-8 mb-4">
+      <div className="mt-6 mb-2">
         <form id="addBusinessForm" onSubmit={(e) => handleSubmit(e)}>
-          <div className="grid gap-4">
-            <div className="grid gap-1">
-              <label htmlFor="name" className="text-sm font-medium text-zinc-300">
-                Business Name *
-              </label>
+          <div className="grid gap-5">
+            <div>
+              <label htmlFor="name" className="pq-label">Business name *</label>
               <input
                 id="name"
                 type="text"
                 name="name"
-                className="w-full p-3 rounded-md bg-zinc-800 text-white placeholder-zinc-500"
-                placeholder="Enter business name"
+                className="pq-input"
+                placeholder="e.g. Clinic on 5th, Hana Hair Studio"
                 required
                 maxLength={255}
               />
             </div>
-            <div className="grid gap-1">
-              <label htmlFor="description" className="text-sm font-medium text-zinc-300">
-                Description
-              </label>
+            <div>
+              <label htmlFor="description" className="pq-label">Description</label>
               <textarea
                 id="description"
                 name="description"
                 rows={4}
-                className="w-full p-3 rounded-md bg-zinc-800 text-white placeholder-zinc-500 resize-none"
-                placeholder="Enter business description (optional)"
+                className="pq-input resize-none"
+                placeholder="Optional — a short sentence that describes this business."
                 maxLength={1000}
               />
             </div>
@@ -73,4 +69,3 @@ export default function AddBusinessForm() {
     </Card>
   );
 }
-
