@@ -7,6 +7,7 @@ import AddPositionForm from '@/components/ui/LineForms/AddPositionForm';
 import PositionActions from '@/components/ui/LineForms/PositionActions';
 import NextInLineButton from '@/components/ui/LineForms/NextInLineButton';
 import { getURL } from 'utils/helpers';
+import RealtimeRefresh from '@/components/RealtimeRefresh';
 
 export default async function LineManagementPage({
   params
@@ -71,6 +72,7 @@ export default async function LineManagementPage({
 
   return (
     <section className="relative">
+      <RealtimeRefresh lineId={lineId} />
       <div className="absolute inset-x-0 top-0 h-[360px] pq-grid-bg pointer-events-none" aria-hidden="true" />
 
       {/* Header */}

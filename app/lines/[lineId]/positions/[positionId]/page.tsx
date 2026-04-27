@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getLineWithPositions } from '@/utils/supabase/queries';
+import RealtimeRefresh from '@/components/RealtimeRefresh';
 
 export default async function PublicPositionPage({
   params
@@ -52,6 +53,8 @@ export default async function PublicPositionPage({
             : 'radial-gradient(800px 500px at 50% 0%, oklch(0.72 0.18 290 / 0.10), transparent 60%)'
         }}
       />
+
+      <RealtimeRefresh lineId={lineId} />
 
       <div className="w-full max-w-md relative">
         {/* Header */}
