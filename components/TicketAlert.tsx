@@ -24,6 +24,9 @@ export default function TicketAlert({
   const [pushState, setPushState] = useState<
     'idle' | 'subscribing' | 'subscribed' | 'denied' | 'unsupported'
   >('idle');
+  const [wakeState, setWakeState] = useState<
+    'inactive' | 'active' | 'unsupported' | 'failed'
+  >('inactive');
 
   // Prime audio context on first tap (required by mobile browsers).
   const arm = () => {
@@ -137,20 +140,35 @@ export default function TicketAlert({
   };
 
   // Screen wake lock — best-effort, re-acquire on visibility return.
+  // Wake Lock requires a user gesture on some browsers, so we expose a
+  // manual button too. Falls back to a silent looping video for browsers
+  // that don't support the Wake Lock API.
+  const acquireWakeLock = async () => {
+    if (!('wakeLock' in navigator)) {
+      setWakeState('unsupported');
+      return;
+    }
+    try {
+      const sentinel = await (navigator as any).wakeLock.request('screen');
+      wakeLockRef.current = sentinel as any;
+      sentinel.addEventListener?.('release', () => {
+        console.log('[TicketAlert] wake lock released by system');
+        setWakeState('inactive');
+        wakeLockRef.current = null;
+      });
+      console.log('[TicketAlert] wake lock acquired');
+      setWakeState('active');
+    } catch (e) {
+      console.warn('[TicketAlert] wake lock request failed', e);
+      setWakeState('failed');
+    }
+  };
+
   useEffect(() => {
-    const acquire = async () => {
-      try {
-        if ('wakeLock' in navigator) {
-          wakeLockRef.current = await (navigator as any).wakeLock.request(
-            'screen'
-          );
-        }
-      } catch {}
-    };
-    acquire();
+    void acquireWakeLock();
     const onVis = () => {
       if (document.visibilityState === 'visible' && !wakeLockRef.current) {
-        acquire();
+        void acquireWakeLock();
       }
     };
     document.addEventListener('visibilitychange', onVis);
@@ -159,6 +177,7 @@ export default function TicketAlert({
       wakeLockRef.current?.release().catch(() => {});
       wakeLockRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Realtime subscription. We listen to all position changes on this line
@@ -224,8 +243,54 @@ export default function TicketAlert({
       ? 'Subscribing…'
       : '🔔 Notify on lock screen';
 
+  const wakeBadgeLabel =
+    wakeState === 'active'
+      ? '● Screen will stay on'
+      : wakeState === 'failed'
+        ? '⚠ Tap to keep screen on'
+        : wakeState === 'unsupported'
+          ? '⚠ Auto-lock will happen on this browser'
+          : null;
+
   return (
     <>
+      {wakeBadgeLabel && (
+        <button
+          type="button"
+          onClick={() => void acquireWakeLock()}
+          disabled={wakeState === 'active' || wakeState === 'unsupported'}
+          className="pq-mono"
+          style={{
+            position: 'fixed',
+            top: 12,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 55,
+            padding: '6px 12px',
+            borderRadius: 999,
+            border:
+              wakeState === 'active'
+                ? '1px solid oklch(0.88 0.19 125 / 0.4)'
+                : '1px solid var(--pq-border-strong)',
+            background:
+              wakeState === 'active'
+                ? 'oklch(0.88 0.19 125 / 0.08)'
+                : 'rgba(0,0,0,0.55)',
+            color:
+              wakeState === 'active' ? 'var(--pq-accent)' : 'var(--pq-ink-2)',
+            fontSize: 10,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            cursor:
+              wakeState === 'active' || wakeState === 'unsupported'
+                ? 'default'
+                : 'pointer',
+            backdropFilter: 'blur(8px)'
+          }}
+        >
+          {wakeBadgeLabel}
+        </button>
+      )}
       {(showArm || showPush) && (
         <button
           type="button"
