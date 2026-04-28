@@ -139,33 +139,13 @@ export default function TicketAlert({
     };
   }, []);
 
-  // Realtime subscription for this ticket + the line as a whole.
+  // Realtime subscription. We listen to all position changes on this line
+  // (single handler, since stacking multiple postgres_changes filters on the
+  // same channel is unreliable in some realtime client versions).
   useEffect(() => {
     const supabase = createClient();
     const channel = supabase
-      .channel(`ticket:${positionId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'positions',
-          filter: `id=eq.${positionId}`
-        },
-        (payload: any) => {
-          const newStatus = payload?.new?.status;
-          if (
-            newStatus === 'called' &&
-            lastStatusRef.current !== 'called'
-          ) {
-            fireAlert(audioCtxRef.current);
-            setFlash(true);
-            window.setTimeout(() => setFlash(false), 6000);
-          }
-          if (newStatus) lastStatusRef.current = newStatus;
-          router.refresh();
-        }
-      )
+      .channel(`ticket:${positionId}:${Date.now()}`)
       .on(
         'postgres_changes',
         {
@@ -174,20 +154,27 @@ export default function TicketAlert({
           table: 'positions',
           filter: `line_id=eq.${lineId}`
         },
-        () => router.refresh()
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'lines',
-          filter: `id=eq.${lineId}`
-        },
-        () => router.refresh()
+        (payload: any) => {
+          const row = payload?.new || payload?.old;
+          if (row && String(row.id) === String(positionId)) {
+            const newStatus = payload?.new?.status;
+            if (newStatus === 'called' && lastStatusRef.current !== 'called') {
+              fireAlert(audioCtxRef.current);
+              setFlash(true);
+              window.setTimeout(() => setFlash(false), 6000);
+            }
+            if (newStatus) lastStatusRef.current = newStatus;
+          }
+          router.refresh();
+        }
       )
       .subscribe();
+
+    // Defense-in-depth: poll every 8s in case realtime drops.
+    const pollId = window.setInterval(() => router.refresh(), 8000);
+
     return () => {
+      window.clearInterval(pollId);
       supabase.removeChannel(channel);
     };
   }, [positionId, lineId, router]);
