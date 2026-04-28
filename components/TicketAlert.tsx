@@ -80,18 +80,35 @@ export default function TicketAlert({
       !('PushManager' in window) ||
       !process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
     ) {
+      console.warn('[TicketAlert] push not supported on this browser');
       setPushState('unsupported');
       return;
     }
+    // Ask for permission FIRST, while the user gesture is still active.
+    // Awaiting service-worker setup before this consumes the gesture and
+    // Chrome silently swallows the prompt.
+    let permission: NotificationPermission;
+    try {
+      permission = await Notification.requestPermission();
+    } catch (e) {
+      console.error('[TicketAlert] requestPermission threw', e);
+      setPushState('idle');
+      return;
+    }
+    console.log('[TicketAlert] permission =', permission);
+    if (permission === 'denied') {
+      setPushState('denied');
+      return;
+    }
+    if (permission !== 'granted') {
+      setPushState('idle');
+      return;
+    }
+
     setPushState('subscribing');
     try {
       const reg = await navigator.serviceWorker.register('/sw.js');
       await navigator.serviceWorker.ready;
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        setPushState(permission === 'denied' ? 'denied' : 'idle');
-        return;
-      }
       let sub = await reg.pushManager.getSubscription();
       if (!sub) {
         sub = await reg.pushManager.subscribe({
@@ -107,9 +124,14 @@ export default function TicketAlert({
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ positionId, subscription: json })
       });
-      if (!res.ok) throw new Error('subscribe failed');
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`subscribe failed: ${res.status} ${text}`);
+      }
+      console.log('[TicketAlert] subscription stored');
       setPushState('subscribed');
     } catch (e) {
+      console.error('[TicketAlert] subscribe error', e);
       setPushState('idle');
     }
   };
