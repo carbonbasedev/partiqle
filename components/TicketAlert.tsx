@@ -21,6 +21,9 @@ export default function TicketAlert({
   const audioCtxRef = useRef<AudioContext | null>(null);
   const [armed, setArmed] = useState(false);
   const [flash, setFlash] = useState(false);
+  const [pushState, setPushState] = useState<
+    'idle' | 'subscribing' | 'subscribed' | 'denied' | 'unsupported'
+  >('idle');
 
   // Prime audio context on first tap (required by mobile browsers).
   const arm = () => {
@@ -48,6 +51,68 @@ export default function TicketAlert({
       if (sessionStorage.getItem('ticketAlertArmed') === '1') setArmed(true);
     } catch {}
   }, []);
+
+  // Detect existing push subscription on mount
+  useEffect(() => {
+    if (
+      typeof window === 'undefined' ||
+      !('serviceWorker' in navigator) ||
+      !('PushManager' in window)
+    ) {
+      setPushState('unsupported');
+      return;
+    }
+    if (Notification.permission === 'denied') {
+      setPushState('denied');
+      return;
+    }
+    navigator.serviceWorker.ready
+      .then((reg) => reg.pushManager.getSubscription())
+      .then((sub) => {
+        if (sub) setPushState('subscribed');
+      })
+      .catch(() => {});
+  }, []);
+
+  const subscribePush = async () => {
+    if (
+      !('serviceWorker' in navigator) ||
+      !('PushManager' in window) ||
+      !process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    ) {
+      setPushState('unsupported');
+      return;
+    }
+    setPushState('subscribing');
+    try {
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        setPushState(permission === 'denied' ? 'denied' : 'idle');
+        return;
+      }
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(
+            process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+          )
+        });
+      }
+      const json = sub.toJSON();
+      const res = await fetch('/api/push/subscribe', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ positionId, subscription: json })
+      });
+      if (!res.ok) throw new Error('subscribe failed');
+      setPushState('subscribed');
+    } catch (e) {
+      setPushState('idle');
+    }
+  };
 
   // Screen wake lock — best-effort, re-acquire on visibility return.
   useEffect(() => {
@@ -127,12 +192,36 @@ export default function TicketAlert({
     };
   }, [positionId, lineId, router]);
 
+  const showArm = !armed;
+  const showPush =
+    armed &&
+    pushState !== 'subscribed' &&
+    pushState !== 'denied' &&
+    pushState !== 'unsupported';
+
+  const onClick = () => {
+    if (!armed) {
+      arm();
+      // Try to subscribe push immediately while we have the user gesture.
+      void subscribePush();
+      return;
+    }
+    void subscribePush();
+  };
+
+  const label = showArm
+    ? '🔔 Enable alerts'
+    : pushState === 'subscribing'
+      ? 'Subscribing…'
+      : '🔔 Notify on lock screen';
+
   return (
     <>
-      {!armed && (
+      {(showArm || showPush) && (
         <button
           type="button"
-          onClick={arm}
+          onClick={onClick}
+          disabled={pushState === 'subscribing'}
           className="pq-mono"
           style={{
             position: 'fixed',
@@ -148,16 +237,25 @@ export default function TicketAlert({
             fontSize: 12,
             letterSpacing: '0.16em',
             textTransform: 'uppercase',
-            cursor: 'pointer',
+            cursor: pushState === 'subscribing' ? 'wait' : 'pointer',
             boxShadow: '0 6px 24px rgba(0,0,0,0.45)'
           }}
         >
-          🔔 Enable alerts
+          {label}
         </button>
       )}
       {flash && <CalledFlash />}
     </>
   );
+}
+
+function urlBase64ToUint8Array(base64: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64.length % 4)) % 4);
+  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(b64);
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+  return out;
 }
 
 function CalledFlash() {

@@ -3,6 +3,7 @@
 import type { Database } from '@/types_db';
 import { createClient } from '@/utils/supabase/server';
 import { getErrorRedirect, getStatusRedirect } from 'utils/helpers';
+import { sendCallNotification } from '@/utils/push';
 
 export async function addPosition(formData: FormData) {
   const name = String(formData.get('name')).trim();
@@ -119,12 +120,14 @@ export async function callPosition(formData: FormData) {
     .from('positions')
     .update({ status: 'called'} as never)
     .eq('id', positionId);
-  
+
   // Update line's current position
   await supabase
     .from('lines')
     .update({ position: positionData?.position ?? null } as never)
     .eq('id', lineId);
+
+  await sendCallNotification(positionId);
 
   return getStatusRedirect(
     `/businesses/${businessId}/lines/${lineId}`,
@@ -183,6 +186,9 @@ export async function callNextPosition(formData: FormData) {
     .update({ position: nextPositionData?.position ?? null } as never)
     .eq('id', lineId);
 
+  if (nextPositionData?.id) {
+    await sendCallNotification(nextPositionData.id);
+  }
 
   return getStatusRedirect(
     `/businesses/${businessId}/lines/${lineId}`,
