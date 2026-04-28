@@ -19,7 +19,7 @@ export default function Footer() {
             className="pq-mono"
             style={{ color: 'var(--pq-ink-2)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase' }}
           >
-            Partiqle — Restore time
+            Partiqle — Restore time2
           </span>
         </div>
         <div
