@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getLineWithPositions } from '@/utils/supabase/queries';
-import RealtimeRefresh from '@/components/RealtimeRefresh';
+import TicketAlert from '@/components/TicketAlert';
 
 export default async function PublicPositionPage({
   params
@@ -54,7 +54,11 @@ export default async function PublicPositionPage({
         }}
       />
 
-      <RealtimeRefresh lineId={lineId} />
+      <TicketAlert
+        positionId={String(positionId)}
+        lineId={lineId}
+        initialStatus={String(position.status)}
+      />
 
       <div className="w-full max-w-md relative">
         {/* Header */}
