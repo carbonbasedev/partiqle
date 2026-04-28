@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  const supabase = (await createClient()) as any;
 
   const { error } = await supabase.from('push_subscriptions').insert({
     position_id: Number(positionId),

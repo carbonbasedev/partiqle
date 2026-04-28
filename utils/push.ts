@@ -30,7 +30,7 @@ export async function sendCallNotification(positionId: number | string) {
   } catch {
     return;
   }
-  const supabase = adminClient();
+  const supabase = adminClient() as any;
   const { data: subs } = await supabase
     .from('push_subscriptions')
     .select('id, endpoint, p256dh, auth, position_id')
