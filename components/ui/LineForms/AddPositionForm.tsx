@@ -25,6 +25,7 @@ export default function AddPositionForm({ businessId, lineId }: AddPositionFormP
 
   return (
     <Card
+      className="w-full pq-card overflow-hidden"
       title="Add walk-in"
       description="Manually add someone to the end of the queue."
       footer={

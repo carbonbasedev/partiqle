@@ -78,23 +78,16 @@ export default async function LineManagementPage({
       <div className="absolute inset-x-0 top-0 h-[360px] pq-grid-bg pointer-events-none" aria-hidden="true" />
 
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-6 pt-16 sm:pt-20 pb-6 relative">
-        <Link
-          href={`/businesses/${id}/lines`}
-          className="pq-mono inline-flex items-center gap-2 mb-6"
-          style={{ color: 'var(--pq-ink-2)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase' }}
-        >
-          ← {business.name} / Lines
-        </Link>
-        <div className="flex items-end justify-between gap-4 flex-wrap">
+      <div className="max-w-7xl mx-auto px-6 pb-5 relative">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <div className="pq-eyebrow mb-4">
+            <div className="pq-eyebrow mb-2">
               <span className="pq-dot" />
-              Live · {lineData.name}
+              Live · {business.name}
             </div>
             <h1
               style={{
-                fontSize: 48,
+                fontSize: 40,
                 fontWeight: 600,
                 letterSpacing: '-0.03em',
                 color: 'var(--pq-ink-0)',
@@ -104,13 +97,6 @@ export default async function LineManagementPage({
               {lineData.name}
             </h1>
           </div>
-          <NextInLineButton
-            businessId={id}
-            lineId={lineId}
-            disabled={waitingPositions.length === 0 || (lineData as any).paused}
-          />
-        </div>
-        <div className="mt-6">
           <LineAdminControls
             lineId={lineId}
             businessId={id}
@@ -119,7 +105,7 @@ export default async function LineManagementPage({
         </div>
         {(lineData as any).paused && (
           <div
-            className="pq-mono mt-5 inline-flex items-center gap-2"
+            className="pq-mono mt-4 inline-flex items-center gap-2"
             style={{
               padding: '8px 14px',
               borderRadius: 8,
@@ -134,6 +120,53 @@ export default async function LineManagementPage({
             ❚❚  Line paused — new joins blocked
           </div>
         )}
+      </div>
+
+      {/* Live queue — full-width visual */}
+      <div className="max-w-7xl mx-auto px-6 relative mb-6">
+        <div
+          className="pq-card relative overflow-hidden"
+          style={{
+            padding: '20px 24px 18px',
+            background:
+              'linear-gradient(180deg, var(--pq-surface-1) 0%, var(--pq-surface-0) 100%)'
+          }}
+        >
+          <div
+            className="absolute inset-0 pointer-events-none"
+            aria-hidden="true"
+            style={{
+              backgroundImage:
+                'radial-gradient(700px 280px at 6% 50%, oklch(0.88 0.19 125 / 0.08), transparent 65%)'
+            }}
+          />
+          <div className="relative">
+            <div className="flex items-baseline justify-between mb-4 flex-wrap gap-2">
+              <div className="pq-eyebrow">
+                <span className="pq-dot" />
+                Live queue
+              </div>
+              <div
+                className="pq-mono"
+                style={{
+                  fontSize: 11,
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: 'var(--pq-ink-3)'
+                }}
+              >
+                {waitingPositions.length} waiting · next #
+                {waitingPositions[0]
+                  ? fmtNum(waitingPositions[0].position)
+                  : '—'}
+              </div>
+            </div>
+            <QueueVisual
+              positions={waitingPositions as any}
+              nowServing={lineData.position}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Now-serving ticket display */}
@@ -235,13 +268,24 @@ export default async function LineManagementPage({
                   </div>
                 )}
               </dl>
+              <div className="mt-7 pt-6" style={{ borderTop: '1px solid var(--pq-line)' }}>
+                <NextInLineButton
+                  businessId={id}
+                  lineId={lineId}
+                  disabled={
+                    waitingPositions.length === 0 || (lineData as any).paused
+                  }
+                  size="large"
+                  fullWidth
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Two-column: queue + QR/add */}
-      <div className="max-w-7xl mx-auto px-6 relative mt-8 pb-24">
+      <div className="max-w-7xl mx-auto px-6 relative mt-8 pb-6">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           {/* Queue stream */}
           <div className="pq-card p-6 md:p-8">
@@ -252,13 +296,6 @@ export default async function LineManagementPage({
                   Waiting · {waitingPositions.length}
                 </h2>
               </div>
-            </div>
-
-            <div className="mb-6 pb-6" style={{ borderBottom: '1px solid var(--pq-line)' }}>
-              <QueueVisual
-                positions={waitingPositions as any}
-                nowServing={lineData.position}
-              />
             </div>
 
             {waitingPositions.length === 0 ? (
@@ -402,6 +439,8 @@ export default async function LineManagementPage({
 
           {/* Sidebar: QR + add form */}
           <div className="flex flex-col gap-6">
+            <AddPositionForm businessId={id} lineId={lineId} />
+
             <div className="pq-card p-6 md:p-8">
               <div className="pq-eyebrow mb-4">Self-serve</div>
               <h3 style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.015em', color: 'var(--pq-ink-0)', marginBottom: 4 }}>
@@ -447,8 +486,6 @@ export default async function LineManagementPage({
                 Open fullscreen display →
               </Link>
             </div>
-
-            <AddPositionForm businessId={id} lineId={lineId} />
           </div>
         </div>
       </div>

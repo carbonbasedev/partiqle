@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="mt-32 border-t" style={{ borderColor: 'var(--pq-border)' }}>
+    <footer className="mt-12 border-t" style={{ borderColor: 'var(--pq-border)' }}>
       <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <svg

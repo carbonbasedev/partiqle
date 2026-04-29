@@ -5,12 +5,15 @@ interface Props {
   description?: string;
   footer?: ReactNode;
   children: ReactNode;
+  className?: string;
 }
 
-export default function Card({ title, description, footer, children }: Props) {
+export default function Card({ title, description, footer, children, className }: Props) {
   return (
     <div
-      className="w-full max-w-3xl m-auto my-8 pq-card overflow-hidden"
+      className={
+        className ?? 'w-full max-w-3xl m-auto my-8 pq-card overflow-hidden'
+      }
     >
       <div className="px-6 py-5">
         <div className="pq-eyebrow mb-3">Partiqle</div>
