@@ -164,6 +164,7 @@ export default async function LineManagementPage({
             <QueueVisual
               positions={waitingPositions as any}
               nowServing={lineData.position}
+              servingPosition={(currentPosition as any) ?? null}
             />
           </div>
         </div>
