@@ -39,6 +39,16 @@ export const getUserDetails = cache(async (supabase: SupabaseClient): Promise<Da
   return userDetails;
 });
 
+export const getUserBusiness = cache(async (supabase: SupabaseClient): Promise<Database['public']['Tables']['businesses']['Row'] | null> => {
+  const { data: business } = await supabase
+    .from('businesses')
+    .select('*')
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  return (business as unknown as Database['public']['Tables']['businesses']['Row']) ?? null;
+});
+
 export const getBusinesses = cache(async (supabase: SupabaseClient) => {
   const { data: businesses, error } = await supabase
     .from('businesses')

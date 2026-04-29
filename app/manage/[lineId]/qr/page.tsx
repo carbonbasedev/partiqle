@@ -2,13 +2,13 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import { getUser, getBusiness, getLineWithPositions } from '@/utils/supabase/queries';
+import { getUser, getUserBusiness, getLineWithPositions } from '@/utils/supabase/queries';
 import { getURL } from 'utils/helpers';
 
 export default async function LineQRDisplayPage({
   params
 }: {
-  params: Promise<{ id: string; lineId: string }>;
+  params: Promise<{ lineId: string }>;
 }) {
   const supabase = await createClient();
   const user = await getUser(supabase);
@@ -17,17 +17,17 @@ export default async function LineQRDisplayPage({
     return redirect('/signin');
   }
 
-  const { id, lineId } = await params;
-  const business = await getBusiness(supabase, id);
+  const { lineId } = await params;
+  const business = await getUserBusiness(supabase);
 
-  if (!business || business.user_id !== user.id) {
-    return redirect('/businesses');
+  if (!business) {
+    return redirect('/account');
   }
 
   const lineData = await getLineWithPositions(supabase, lineId);
 
-  if (!lineData || !lineData.id || lineData.business_id !== id) {
-    return redirect(`/businesses/${id}/lines`);
+  if (!lineData || !lineData.id || lineData.business_id !== business.id) {
+    return redirect('/manage');
   }
 
   const host = (await headers()).get('host') ?? undefined;
@@ -45,7 +45,7 @@ export default async function LineQRDisplayPage({
     >
       <div className="absolute top-4 left-4">
         <Link
-          href={`/businesses/${id}/lines/${lineId}`}
+          href={`/manage/${lineId}`}
           className="pq-mono"
           style={{
             color: 'var(--pq-ink-3)',

@@ -21,7 +21,7 @@ export async function addLine(formData: FormData) {
     ] as any);
 
   return getStatusRedirect(
-    `/businesses/${businessId}/lines`,
+    `/manage`,
     'Success!',
     'Your line has been created.'
   );
@@ -40,7 +40,7 @@ export async function togglePaused(formData: FormData) {
     .eq('id', lineId);
 
   return getStatusRedirect(
-    `/businesses/${businessId}/lines/${lineId}`,
+    `/manage/${lineId}`,
     'Success!',
     paused ? 'Line resumed.' : 'Line paused — new joins blocked.'
   );
@@ -60,7 +60,7 @@ export async function resetLine(formData: FormData) {
     .eq('id', lineId);
 
   return getStatusRedirect(
-    `/businesses/${businessId}/lines/${lineId}`,
+    `/manage/${lineId}`,
     'Line reset.',
     'All positions were removed and numbering restarts at 1.'
   );

@@ -39,7 +39,7 @@ export async function addPosition(formData: FormData) {
     ] as any);
 
   return getStatusRedirect(
-    `/businesses/${businessId}/lines/${lineId}`,
+    `/manage/${lineId}`,
     'Success!',
     'Position added to the line.'
   );
@@ -130,7 +130,7 @@ export async function callPosition(formData: FormData) {
   await sendCallNotification(positionId);
 
   return getStatusRedirect(
-    `/businesses/${businessId}/lines/${lineId}`,
+    `/manage/${lineId}`,
     'Success!',
     `Position has been called.`
   );
@@ -150,7 +150,7 @@ export async function skipPosition(formData: FormData) {
     .eq('id', positionId);
 
   return getStatusRedirect(
-    `/businesses/${businessId}/lines/${lineId}`,
+    `/manage/${lineId}`,
     'Success!',
     `Position skipped`
   );
@@ -191,7 +191,7 @@ export async function callNextPosition(formData: FormData) {
   }
 
   return getStatusRedirect(
-    `/businesses/${businessId}/lines/${lineId}`,
+    `/manage/${lineId}`,
     'Success!',
     `Next position has been called.`
   );

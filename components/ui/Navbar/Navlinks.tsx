@@ -191,11 +191,11 @@ export default function Navlinks({ user, variant = 'desktop' }: NavlinksProps) {
             {user && (
               <>
                 <Link
-                  href="/businesses"
-                  className={`${s.link} ${isActive('/businesses') ? s.linkActive : ''}`}
+                  href="/manage"
+                  className={`${s.link} ${isActive('/manage') ? s.linkActive : ''}`}
                   style={{ padding: '10px 12px', fontSize: 15 }}
                 >
-                  Businesses
+                  Lines
                 </Link>
                 <Link
                   href="/account"
@@ -261,10 +261,10 @@ export default function Navlinks({ user, variant = 'desktop' }: NavlinksProps) {
           {user && (
             <>
               <Link
-                href="/businesses"
-                className={`${s.link} ${isActive('/businesses') ? s.linkActive : ''}`}
+                href="/manage"
+                className={`${s.link} ${isActive('/manage') ? s.linkActive : ''}`}
               >
-                Businesses
+                Lines
               </Link>
               <Link
                 href="/account"

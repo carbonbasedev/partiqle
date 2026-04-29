@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/server';
-import { getUser, getBusiness, getLineWithPositions } from '@/utils/supabase/queries';
+import { getUser, getUserBusiness, getLineWithPositions } from '@/utils/supabase/queries';
 import AddPositionForm from '@/components/ui/LineForms/AddPositionForm';
 import PositionActions from '@/components/ui/LineForms/PositionActions';
 import NextInLineButton from '@/components/ui/LineForms/NextInLineButton';
@@ -14,7 +14,7 @@ import LineAdminControls from '@/components/ui/LineForms/LineAdminControls';
 export default async function LineManagementPage({
   params
 }: {
-  params: Promise<{ id: string; lineId: string }>;
+  params: Promise<{ lineId: string }>;
 }) {
   const supabase = await createClient();
   const user = await getUser(supabase);
@@ -23,21 +23,19 @@ export default async function LineManagementPage({
     return redirect('/signin');
   }
 
-  const { id, lineId } = await params;
-  const business = await getBusiness(supabase, id);
+  const { lineId } = await params;
+  const business = await getUserBusiness(supabase);
 
   if (!business) {
-    return redirect('/businesses');
+    return redirect('/account');
   }
 
-  if (business.user_id !== user.id) {
-    return redirect('/businesses');
-  }
+  const id = business.id;
 
   const lineData = await getLineWithPositions(supabase, lineId);
 
   if (!lineData || !lineData.id || lineData.business_id !== id) {
-    return redirect(`/businesses/${id}/lines`);
+    return redirect('/manage');
   }
 
   const host = (await headers()).get('host') ?? undefined;
@@ -487,7 +485,7 @@ export default async function LineManagementPage({
                 </Link>
               </div>
               <Link
-                href={`/businesses/${id}/lines/${lineId}/qr`}
+                href={`/manage/${lineId}/qr`}
                 target="_blank"
                 className="pq-btn pq-btn-ghost mt-4 w-full justify-center"
               >

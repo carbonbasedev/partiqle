@@ -1,3 +1,4 @@
+import BusinessNameForm from '@/components/ui/AccountForms/BusinessNameForm';
 import CustomerPortalForm from '@/components/ui/AccountForms/CustomerPortalForm';
 import EmailForm from '@/components/ui/AccountForms/EmailForm';
 import NameForm from '@/components/ui/AccountForms/NameForm';
@@ -6,15 +7,17 @@ import { createClient } from '@/utils/supabase/server';
 import {
   getUserDetails,
   getSubscription,
-  getUser
+  getUser,
+  getUserBusiness
 } from '@/utils/supabase/queries';
 
 export default async function Account() {
   const supabase = await createClient();
-  const [user, userDetails, subscription] = await Promise.all([
+  const [user, userDetails, subscription, business] = await Promise.all([
     getUser(supabase),
     getUserDetails(supabase),
-    getSubscription(supabase)
+    getSubscription(supabase),
+    getUserBusiness(supabase)
   ]);
 
   if (!user) {
@@ -42,6 +45,10 @@ export default async function Account() {
         </p>
       </div>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 relative">
+        <BusinessNameForm
+          currentName={business?.name ?? null}
+          isFirstTime={!business}
+        />
         <CustomerPortalForm subscription={subscription} />
         <NameForm userName={userDetails?.full_name ?? ''} />
         <EmailForm userEmail={user.email} />
