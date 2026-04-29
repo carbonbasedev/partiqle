@@ -252,71 +252,69 @@ export default function TicketAlert({
           ? '⚠ Auto-lock will happen on this browser'
           : null;
 
+  const showAnyButton = (showArm || showPush) || !!wakeBadgeLabel;
+
   return (
     <>
-      {wakeBadgeLabel && (
-        <button
-          type="button"
-          onClick={() => void acquireWakeLock()}
-          disabled={wakeState === 'active' || wakeState === 'unsupported'}
-          className="pq-mono"
-          style={{
-            position: 'fixed',
-            top: 12,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 55,
-            padding: '6px 12px',
-            borderRadius: 999,
-            border:
-              wakeState === 'active'
-                ? '1px solid oklch(0.88 0.19 125 / 0.4)'
-                : '1px solid var(--pq-border-strong)',
-            background:
-              wakeState === 'active'
-                ? 'oklch(0.88 0.19 125 / 0.08)'
-                : 'rgba(0,0,0,0.55)',
-            color:
-              wakeState === 'active' ? 'var(--pq-accent)' : 'var(--pq-ink-2)',
-            fontSize: 10,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            cursor:
-              wakeState === 'active' || wakeState === 'unsupported'
-                ? 'default'
-                : 'pointer',
-            backdropFilter: 'blur(8px)'
-          }}
-        >
-          {wakeBadgeLabel}
-        </button>
-      )}
-      {(showArm || showPush) && (
-        <button
-          type="button"
-          onClick={onClick}
-          disabled={pushState === 'subscribing'}
-          className="pq-mono"
-          style={{
-            position: 'fixed',
-            bottom: 16,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 60,
-            padding: '10px 18px',
-            borderRadius: 999,
-            border: '1px solid oklch(0.88 0.19 125 / 0.55)',
-            background: 'oklch(0.88 0.19 125 / 0.10)',
-            color: 'var(--pq-accent)',
-            fontSize: 12,
-            letterSpacing: '0.16em',
-            textTransform: 'uppercase',
-            cursor: pushState === 'subscribing' ? 'wait' : 'pointer',
-            boxShadow: '0 6px 24px rgba(0,0,0,0.45)'
-          }}
-        >
-          {label}
-        </button>
+      {showAnyButton && (
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
+          {(showArm || showPush) && (
+            <button
+              type="button"
+              onClick={onClick}
+              disabled={pushState === 'subscribing'}
+              className="pq-mono"
+              style={{
+                flex: 1,
+                padding: '10px 14px',
+                borderRadius: 10,
+                border: '1px solid oklch(0.88 0.19 125 / 0.45)',
+                background: 'oklch(0.88 0.19 125 / 0.08)',
+                color: 'var(--pq-accent)',
+                fontSize: 11,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                cursor: pushState === 'subscribing' ? 'wait' : 'pointer'
+              }}
+            >
+              {label}
+            </button>
+          )}
+          {wakeBadgeLabel && (
+            <button
+              type="button"
+              onClick={() => void acquireWakeLock()}
+              disabled={wakeState === 'active' || wakeState === 'unsupported'}
+              className="pq-mono"
+              style={{
+                flex: 1,
+                padding: '10px 14px',
+                borderRadius: 10,
+                border:
+                  wakeState === 'active'
+                    ? '1px solid oklch(0.88 0.19 125 / 0.4)'
+                    : '1px solid var(--pq-border-strong)',
+                background:
+                  wakeState === 'active'
+                    ? 'oklch(0.88 0.19 125 / 0.08)'
+                    : 'transparent',
+                color:
+                  wakeState === 'active'
+                    ? 'var(--pq-accent)'
+                    : 'var(--pq-ink-2)',
+                fontSize: 11,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                cursor:
+                  wakeState === 'active' || wakeState === 'unsupported'
+                    ? 'default'
+                    : 'pointer'
+              }}
+            >
+              {wakeBadgeLabel}
+            </button>
+          )}
+        </div>
       )}
       {flash && <CalledFlash />}
     </>

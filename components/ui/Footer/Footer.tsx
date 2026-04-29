@@ -1,4 +1,15 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+
 export default function Footer() {
+  const pathname = usePathname() ?? '';
+
+  // Public-facing customer pages (join + ticket) should be edge-to-edge
+  // with no footer chrome.
+  const isPublicTicketFlow = /^\/lines\/[^/]+\//.test(pathname);
+  if (isPublicTicketFlow) return null;
+
   return (
     <footer className="mt-12 border-t" style={{ borderColor: 'var(--pq-border)' }}>
       <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">

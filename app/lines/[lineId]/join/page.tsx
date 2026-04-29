@@ -21,10 +21,13 @@ export default async function PublicJoinLinePage({
 
   return (
     <section
-      className="relative min-h-screen flex items-center justify-center px-4 py-12"
+      className="relative flex items-start justify-center px-4 pt-10 pb-6"
       style={{ background: 'var(--pq-bg)' }}
     >
-      <div className="pq-grid-bg absolute inset-0 pointer-events-none opacity-60" aria-hidden="true" />
+      <div
+        className="pq-grid-bg absolute inset-0 pointer-events-none opacity-60"
+        aria-hidden="true"
+      />
       <div
         className="absolute inset-0 pointer-events-none"
         aria-hidden="true"
@@ -34,21 +37,13 @@ export default async function PublicJoinLinePage({
         }}
       />
       <div className="w-full max-w-md relative">
-        <div className="text-center mb-10">
-          <div className="pq-eyebrow mb-4" style={{ justifyContent: 'center' }}>
-            <span className="pq-dot" />
-            Live queue
-          </div>
+        <div className="text-center mb-8">
           <div
-            className="pq-mono mb-3"
-            style={{
-              fontSize: 11,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase',
-              color: 'var(--pq-ink-3)'
-            }}
+            className="pq-eyebrow mb-4 break-words"
+            style={{ justifyContent: 'center' }}
           >
-            You&apos;re joining
+            <span className="pq-dot" />
+            You&apos;re joining {line.name}
           </div>
           <h1
             className="break-words"
@@ -60,20 +55,11 @@ export default async function PublicJoinLinePage({
               lineHeight: 1.05
             }}
           >
-            {line.name}
+            Take a ticket
           </h1>
-          <p
-            className="mt-4"
-            style={{ color: 'var(--pq-ink-2)', fontSize: 15, maxWidth: 340, margin: '16px auto 0' }}
-          >
-            Leave your name and you&apos;ll get a live ticket. Keep the next page open — we&apos;ll update it as you move up.
-          </p>
         </div>
         {isPaused ? (
-          <div
-            className="pq-card text-center"
-            style={{ padding: 32 }}
-          >
+          <div className="pq-card text-center" style={{ padding: 32 }}>
             <div
               className="pq-mono mb-3"
               style={{
@@ -85,24 +71,18 @@ export default async function PublicJoinLinePage({
             >
               ❚❚  Line paused
             </div>
-            <p style={{ color: 'var(--pq-ink-1)', fontSize: 16, lineHeight: 1.5 }}>
-              This line isn&apos;t accepting new joins right now. Check back in a few minutes.
+            <p
+              style={{ color: 'var(--pq-ink-1)', fontSize: 16, lineHeight: 1.5 }}
+            >
+              This line isn&apos;t accepting new joins right now. Check back in a
+              few minutes.
             </p>
           </div>
         ) : (
-          <PublicJoinLineForm lineId={lineId} />
+          <div className="pq-card p-5 sm:p-6">
+            <PublicJoinLineForm lineId={lineId} />
+          </div>
         )}
-        <p
-          className="pq-mono text-center mt-8"
-          style={{
-            fontSize: 10,
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            color: 'var(--pq-ink-3)'
-          }}
-        >
-          Powered by Partiqle
-        </p>
       </div>
     </section>
   );
