@@ -24,11 +24,11 @@ export default async function Account() {
   return (
     <section className="relative">
       <div className="absolute inset-x-0 top-0 h-[360px] pq-grid-bg pointer-events-none" aria-hidden="true" />
-      <div className="max-w-4xl mx-auto px-6 pt-16 sm:pt-24 pb-8 relative">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-10 sm:pt-24 pb-8 relative">
         <div className="pq-eyebrow mb-4">Settings</div>
         <h1
           style={{
-            fontSize: 44,
+            fontSize: 'clamp(32px, 8vw, 44px)',
             fontWeight: 600,
             letterSpacing: '-0.03em',
             color: 'var(--pq-ink-0)',
@@ -41,7 +41,7 @@ export default async function Account() {
           Manage your profile, email and subscription. Billing is handled securely through Stripe.
         </p>
       </div>
-      <div className="max-w-4xl mx-auto px-6 relative">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 relative">
         <CustomerPortalForm subscription={subscription} />
         <NameForm userName={userDetails?.full_name ?? ''} />
         <EmailForm userEmail={user.email} />

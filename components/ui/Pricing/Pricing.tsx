@@ -174,12 +174,12 @@ export default function Pricing({ user, products, subscription }: Props) {
       {/* Hero */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 pq-grid-bg pointer-events-none" aria-hidden="true" />
-        <div className="max-w-6xl mx-auto px-6 pt-16 sm:pt-24 pb-12 relative">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-24 pb-12 relative">
           <div className="grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-10 items-center">
-            <div className="pq-fade-up">
+            <div className="pq-fade-up min-w-0">
               <div className="pq-eyebrow mb-5">Virtual queue infrastructure</div>
               <h1
-                className="text-5xl sm:text-6xl"
+                className="text-4xl sm:text-5xl md:text-6xl"
                 style={{
                   fontWeight: 600,
                   letterSpacing: '-0.035em',
@@ -201,7 +201,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                 ticket on your customer&apos;s phone. Call the next in line with one
                 tap.
               </p>
-              <div className="mt-8 flex items-center gap-3">
+              <div className="mt-8 flex flex-wrap items-center gap-3">
                 <a href="#plans" className="pq-btn pq-btn-primary">
                   Start free
                   <span aria-hidden>→</span>
@@ -210,7 +210,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                   See how it works
                 </a>
               </div>
-              <div className="mt-10 flex items-center gap-6 pq-mono" style={{ color: 'var(--pq-ink-3)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
+              <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-6 pq-mono" style={{ color: 'var(--pq-ink-3)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
                 <span>01 · Scan QR</span>
                 <span>02 · Wait off-site</span>
                 <span>03 · Get called</span>
@@ -229,13 +229,14 @@ export default function Pricing({ user, products, subscription }: Props) {
       </div>
 
       {/* Plans */}
-      <div id="plans" className="max-w-6xl mx-auto px-6 pb-16">
-        <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
-          <div>
+      <div id="plans" className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-8 flex-wrap gap-4">
+          <div className="min-w-0">
             <div className="pq-eyebrow mb-3">Pricing</div>
             <h2
+              className="break-words"
               style={{
-                fontSize: 32,
+                fontSize: 'clamp(24px, 5vw, 32px)',
                 fontWeight: 600,
                 letterSpacing: '-0.025em',
                 color: 'var(--pq-ink-0)'
@@ -429,7 +430,7 @@ export default function Pricing({ user, products, subscription }: Props) {
       </div>
 
       {/* How it works */}
-      <div id="how" className="max-w-6xl mx-auto px-6 pb-24">
+      <div id="how" className="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
         <div className="pq-eyebrow mb-4">How it works</div>
         <div className="grid gap-4 md:grid-cols-3">
           {[

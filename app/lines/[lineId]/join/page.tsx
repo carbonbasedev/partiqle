@@ -51,8 +51,9 @@ export default async function PublicJoinLinePage({
             You&apos;re joining
           </div>
           <h1
+            className="break-words"
             style={{
-              fontSize: 40,
+              fontSize: 'clamp(28px, 8vw, 40px)',
               fontWeight: 600,
               letterSpacing: '-0.03em',
               color: 'var(--pq-ink-0)',

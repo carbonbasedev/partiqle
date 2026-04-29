@@ -78,16 +78,17 @@ export default async function LineManagementPage({
       <div className="absolute inset-x-0 top-0 h-[360px] pq-grid-bg pointer-events-none" aria-hidden="true" />
 
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-6 pb-5 relative">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-5 relative">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
             <div className="pq-eyebrow mb-2">
               <span className="pq-dot" />
-              Live · {business.name}
+              <span className="truncate">Live · {business.name}</span>
             </div>
             <h1
+              className="break-words"
               style={{
-                fontSize: 40,
+                fontSize: 'clamp(28px, 7vw, 40px)',
                 fontWeight: 600,
                 letterSpacing: '-0.03em',
                 color: 'var(--pq-ink-0)',
@@ -123,11 +124,10 @@ export default async function LineManagementPage({
       </div>
 
       {/* Live queue — full-width visual */}
-      <div className="max-w-7xl mx-auto px-6 relative mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative mb-6">
         <div
-          className="pq-card relative overflow-hidden"
+          className="pq-card relative overflow-hidden p-4 sm:p-6"
           style={{
-            padding: '20px 24px 18px',
             background:
               'linear-gradient(180deg, var(--pq-surface-1) 0%, var(--pq-surface-0) 100%)'
           }}
@@ -171,7 +171,7 @@ export default async function LineManagementPage({
       </div>
 
       {/* Now-serving ticket display */}
-      <div className="max-w-7xl mx-auto px-6 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
         <div
           className="pq-card relative overflow-hidden"
           style={{
@@ -189,7 +189,7 @@ export default async function LineManagementPage({
             }}
           />
           <div className="relative grid md:grid-cols-[2fr_1fr] gap-0">
-            <div className="p-8 md:p-10">
+            <div className="p-5 sm:p-8 md:p-10 min-w-0">
               <div className="flex items-center gap-3 mb-6">
                 <div className="pq-eyebrow">
                   <span className="pq-dot" />
@@ -200,9 +200,9 @@ export default async function LineManagementPage({
                 </div>
               </div>
               <div
-                className="pq-ticket-number"
+                className="pq-ticket-number break-all"
                 style={{
-                  fontSize: 'clamp(96px, 14vw, 200px)',
+                  fontSize: 'clamp(72px, 18vw, 200px)',
                   color: currentPosition ? 'var(--pq-accent)' : 'var(--pq-ink-3)',
                   lineHeight: 0.9,
                   fontWeight: 500,
@@ -212,19 +212,19 @@ export default async function LineManagementPage({
                 {currentPosition ? `#${fmtNum(currentPosition.position)}` : '—'}
               </div>
               {currentPosition ? (
-                <div className="mt-6 flex items-end justify-between gap-4 flex-wrap">
-                  <div>
+                <div className="mt-6 flex items-end justify-between gap-3 flex-wrap">
+                  <div className="min-w-0 flex-1">
                     <div className="pq-label" style={{ marginBottom: 4 }}>Customer</div>
-                    <div style={{ fontSize: 24, color: 'var(--pq-ink-0)', fontWeight: 500, letterSpacing: '-0.01em' }}>
+                    <div className="break-words" style={{ fontSize: 'clamp(18px, 4.5vw, 24px)', color: 'var(--pq-ink-0)', fontWeight: 500, letterSpacing: '-0.01em' }}>
                       {currentPosition.name}
                     </div>
                     {currentPosition.phone && (
-                      <div className="pq-mono mt-1" style={{ color: 'var(--pq-ink-3)', fontSize: 13 }}>
+                      <div className="pq-mono mt-1 truncate" style={{ color: 'var(--pq-ink-3)', fontSize: 13 }}>
                         {currentPosition.phone}
                       </div>
                     )}
                   </div>
-                  <div className="pq-chip pq-chip-live">● Called</div>
+                  <div className="pq-chip pq-chip-live flex-shrink-0">● Called</div>
                 </div>
               ) : (
                 <p className="mt-6" style={{ color: 'var(--pq-ink-2)', fontSize: 15 }}>
@@ -237,16 +237,16 @@ export default async function LineManagementPage({
 
             {/* Stats column */}
             <div
-              className="p-8 md:p-10 border-t md:border-t-0 md:border-l"
+              className="p-5 sm:p-8 md:p-10 border-t md:border-t-0 md:border-l min-w-0"
               style={{ borderColor: 'var(--pq-line)' }}
             >
               <div className="pq-label mb-3">Session stats</div>
-              <dl className="grid gap-5">
+              <dl className="grid grid-cols-2 md:grid-cols-1 gap-4 md:gap-5">
                 <div>
                   <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
                     Waiting
                   </dt>
-                  <dd className="pq-ticket-number" style={{ fontSize: 40, color: 'var(--pq-ink-0)' }}>
+                  <dd className="pq-ticket-number" style={{ fontSize: 32, color: 'var(--pq-ink-0)' }}>
                     {fmtNum(waitingPositions.length)}
                   </dd>
                 </div>
@@ -254,16 +254,16 @@ export default async function LineManagementPage({
                   <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
                     Served
                   </dt>
-                  <dd className="pq-ticket-number" style={{ fontSize: 40, color: 'var(--pq-ink-1)' }}>
+                  <dd className="pq-ticket-number" style={{ fontSize: 32, color: 'var(--pq-ink-1)' }}>
                     {fmtNum(totalServed)}
                   </dd>
                 </div>
                 {lastCalledPosition && (
-                  <div>
+                  <div className="col-span-2 md:col-span-1 min-w-0">
                     <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
                       Last called
                     </dt>
-                    <dd style={{ color: 'var(--pq-ink-1)', fontSize: 14, marginTop: 4 }}>
+                    <dd className="truncate" style={{ color: 'var(--pq-ink-1)', fontSize: 14, marginTop: 4 }}>
                       #{fmtNum(lastCalledPosition.position)} · {lastCalledPosition.name}
                     </dd>
                   </div>
@@ -286,10 +286,10 @@ export default async function LineManagementPage({
       </div>
 
       {/* Two-column: queue + QR/add */}
-      <div className="max-w-7xl mx-auto px-6 relative mt-8 pb-6">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative mt-8 pb-6">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] min-w-0">
           {/* Queue stream */}
-          <div className="pq-card p-6 md:p-8">
+          <div className="pq-card p-4 sm:p-6 md:p-8 min-w-0 overflow-hidden">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <div className="pq-eyebrow mb-2">Queue</div>
@@ -317,14 +317,14 @@ export default async function LineManagementPage({
                     className="pq-queue-row"
                     style={{ opacity: idx === 0 ? 1 : 1 - idx * 0.03 }}
                   >
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-2 sm:gap-5">
                       <div
                         className="pq-mono flex-shrink-0"
                         style={{
-                          fontSize: 20,
+                          fontSize: 15,
                           color: idx === 0 ? 'var(--pq-accent)' : 'var(--pq-ink-2)',
                           fontWeight: 500,
-                          minWidth: 56,
+                          minWidth: 36,
                           letterSpacing: '-0.01em'
                         }}
                       >
@@ -334,7 +334,7 @@ export default async function LineManagementPage({
                         <div
                           className="truncate"
                           style={{
-                            fontSize: 15,
+                            fontSize: 14,
                             color: 'var(--pq-ink-0)',
                             fontWeight: 500,
                             letterSpacing: '-0.005em'
@@ -343,13 +343,13 @@ export default async function LineManagementPage({
                           {position.name}
                         </div>
                         {position.phone && (
-                          <div className="pq-mono truncate" style={{ color: 'var(--pq-ink-3)', fontSize: 12, marginTop: 2 }}>
+                          <div className="pq-mono truncate hidden sm:block" style={{ color: 'var(--pq-ink-3)', fontSize: 12, marginTop: 2 }}>
                             {position.phone}
                           </div>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {idx === 0 && <span className="pq-chip pq-chip-live">Next</span>}
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                        {idx === 0 && <span className="pq-chip pq-chip-live hidden sm:inline-flex">Next</span>}
                         <PositionActions
                           position={position}
                           businessId={id}
@@ -379,13 +379,19 @@ export default async function LineManagementPage({
                   History · {pastCalledPositions.length}
                 </summary>
                 <div className="mt-4 overflow-x-auto">
-                  <table className="w-full" style={{ borderCollapse: 'collapse' }}>
+                  <table className="w-full" style={{ borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                     <thead>
                       <tr style={{ borderBottom: '1px solid var(--pq-line)' }}>
-                        {['Position', 'Name', 'Phone', 'Status', 'Time'].map((h) => (
+                        {[
+                          { h: 'Position', cls: '' },
+                          { h: 'Name', cls: '' },
+                          { h: 'Phone', cls: 'hidden md:table-cell' },
+                          { h: 'Status', cls: '' },
+                          { h: 'Time', cls: 'hidden sm:table-cell' }
+                        ].map(({ h, cls }) => (
                           <th
                             key={h}
-                            className="pq-mono text-left py-3 px-2"
+                            className={`pq-mono text-left py-3 px-2 sm:px-2 ${cls}`}
                             style={{
                               fontSize: 10.5,
                               letterSpacing: '0.14em',
@@ -408,10 +414,10 @@ export default async function LineManagementPage({
                           <td className="pq-mono py-3 px-2" style={{ color: 'var(--pq-ink-1)', fontSize: 13 }}>
                             #{fmtNum(position.position)}
                           </td>
-                          <td className="py-3 px-2" style={{ color: 'var(--pq-ink-1)', fontSize: 13 }}>
+                          <td className="py-3 px-2 max-w-[140px] sm:max-w-none truncate" style={{ color: 'var(--pq-ink-1)', fontSize: 13 }}>
                             {position.name}
                           </td>
-                          <td className="pq-mono py-3 px-2" style={{ color: 'var(--pq-ink-3)', fontSize: 12 }}>
+                          <td className="pq-mono py-3 px-2 hidden md:table-cell" style={{ color: 'var(--pq-ink-3)', fontSize: 12 }}>
                             {position.phone || '—'}
                           </td>
                           <td className="py-3 px-2">
@@ -426,7 +432,7 @@ export default async function LineManagementPage({
                               {position.status}
                             </span>
                           </td>
-                          <td className="pq-mono py-3 px-2" style={{ color: 'var(--pq-ink-3)', fontSize: 12 }}>
+                          <td className="pq-mono py-3 px-2 hidden sm:table-cell" style={{ color: 'var(--pq-ink-3)', fontSize: 12 }}>
                             {new Date(position.created_at).toLocaleTimeString()}
                           </td>
                         </tr>
@@ -439,10 +445,10 @@ export default async function LineManagementPage({
           </div>
 
           {/* Sidebar: QR + add form */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 min-w-0">
             <AddPositionForm businessId={id} lineId={lineId} />
 
-            <div className="pq-card p-6 md:p-8">
+            <div className="pq-card p-4 sm:p-6 md:p-8 min-w-0">
               <div className="pq-eyebrow mb-4">Self-serve</div>
               <h3 style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.015em', color: 'var(--pq-ink-0)', marginBottom: 4 }}>
                 Let customers join themselves
@@ -460,19 +466,20 @@ export default async function LineManagementPage({
                 <img
                   src={qrImageSrc}
                   alt="QR code to join this line"
-                  className="w-48 h-48"
+                  className="w-40 h-40 sm:w-48 sm:h-48"
                   style={{ borderRadius: 8 }}
                 />
               </div>
-              <div className="mt-4">
+              <div className="mt-4 min-w-0">
                 <div className="pq-label" style={{ marginBottom: 6 }}>Direct URL</div>
                 <Link
                   href={publicJoinUrl}
-                  className="pq-mono block truncate"
+                  className="pq-mono block truncate w-full"
                   style={{
                     color: 'var(--pq-accent)',
                     fontSize: 12,
-                    textDecoration: 'none'
+                    textDecoration: 'none',
+                    maxWidth: '100%'
                   }}
                   target="_blank"
                 >

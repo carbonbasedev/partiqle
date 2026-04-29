@@ -69,6 +69,8 @@ html {
   height: 100%;
   box-sizing: border-box;
   touch-action: manipulation;
+  overflow-x: hidden;
+  max-width: 100vw;
   font-feature-settings:
     'case' 1,
     'rlig' 1,
@@ -91,6 +93,7 @@ body {
   position: relative;
   min-height: 100%;
   margin: 0;
+  overflow-x: hidden;
   background:
     radial-gradient(1200px 600px at 85% -10%, oklch(0.72 0.18 290 / 0.10), transparent 60%),
     radial-gradient(1000px 500px at 5% 110%, oklch(0.88 0.19 125 / 0.06), transparent 60%),
@@ -153,6 +156,8 @@ p a {
   border: 1px solid var(--pq-border);
   border-radius: var(--pq-r);
   transition: border-color 150ms ease, transform 150ms ease, background 150ms ease;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .pq-card-hover:hover {
@@ -379,12 +384,18 @@ p a {
 
 /* Queue row — a line item in the waiting stream */
 .pq-queue-row {
-  padding: 16px 20px;
+  padding: 12px 12px;
   border-radius: var(--pq-r);
   border: 1px solid transparent;
   background: transparent;
   transition: all 180ms ease;
   position: relative;
+}
+
+@media (min-width: 640px) {
+  .pq-queue-row {
+    padding: 16px 20px;
+  }
 }
 
 .pq-queue-row + .pq-queue-row {
@@ -407,11 +418,11 @@ p a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 12px;
+  padding: 5px 8px;
   border-radius: var(--pq-r-sm);
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   border: 1px solid var(--pq-border);
   background: transparent;
@@ -419,6 +430,14 @@ p a {
   cursor: pointer;
   transition: all 150ms ease;
   white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .pq-row-btn {
+    padding: 6px 12px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
 }
 
 .pq-row-btn:hover {

@@ -33,7 +33,7 @@ export default function PositionActions({ position, businessId, lineId }: Positi
   }
 
   return (
-    <div className="flex gap-2 items-center">
+    <div className="flex gap-1.5 sm:gap-2 items-center">
       <form onSubmit={handleCall}>
         <input type="hidden" name="positionId" value={position.id} />
         <input type="hidden" name="lineId" value={lineId} />
@@ -41,9 +41,15 @@ export default function PositionActions({ position, businessId, lineId }: Positi
         <button
           type="submit"
           disabled={isCalling}
+          aria-label="Call this position"
           className="pq-row-btn pq-row-btn-primary"
         >
-          {isCalling ? '…' : 'Call'}
+          {isCalling ? '…' : (
+            <>
+              <span className="sm:hidden" aria-hidden="true">▶</span>
+              <span className="hidden sm:inline">Call</span>
+            </>
+          )}
         </button>
       </form>
       <form onSubmit={handleSkip}>
@@ -53,9 +59,15 @@ export default function PositionActions({ position, businessId, lineId }: Positi
         <button
           type="submit"
           disabled={isSkipping}
+          aria-label="Skip this position"
           className="pq-row-btn"
         >
-          {isSkipping ? '…' : 'Skip'}
+          {isSkipping ? '…' : (
+            <>
+              <span className="sm:hidden" aria-hidden="true">✕</span>
+              <span className="hidden sm:inline">Skip</span>
+            </>
+          )}
         </button>
       </form>
     </div>

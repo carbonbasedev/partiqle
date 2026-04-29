@@ -16,13 +16,13 @@ export default async function BusinessesPage() {
   return (
     <section className="relative">
       <div className="absolute inset-x-0 top-0 h-[320px] pq-grid-bg pointer-events-none" aria-hidden="true" />
-      <div className="max-w-6xl mx-auto px-6 pt-16 sm:pt-24 pb-6 relative">
-        <div className="flex items-end justify-between gap-4 flex-wrap">
-          <div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-24 pb-6 relative">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
             <div className="pq-eyebrow mb-4">Workspace</div>
             <h1
               style={{
-                fontSize: 44,
+                fontSize: 'clamp(32px, 8vw, 44px)',
                 fontWeight: 600,
                 letterSpacing: '-0.03em',
                 color: 'var(--pq-ink-0)',
@@ -41,9 +41,9 @@ export default async function BusinessesPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 relative pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative pb-24">
         {businesses.length === 0 ? (
-          <div className="pq-card p-12 text-center mt-8">
+          <div className="pq-card p-6 sm:p-10 md:p-12 text-center mt-8">
             <div className="pq-eyebrow mb-4" style={{ justifyContent: 'center' }}>
               Empty
             </div>

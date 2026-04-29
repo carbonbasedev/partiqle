@@ -31,16 +31,17 @@ export default async function BusinessLinesPage({
   return (
     <section className="relative">
       <div className="absolute inset-x-0 top-0 h-[320px] pq-grid-bg pointer-events-none" aria-hidden="true" />
-      <div className="max-w-6xl mx-auto px-6 pt-16 sm:pt-20 pb-6 relative">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-20 pb-6 relative">
         <Link href="/businesses" className="pq-mono inline-flex items-center gap-2 mb-6" style={{ color: 'var(--pq-ink-2)', fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase' }}>
           ← All businesses
         </Link>
-        <div className="flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <div className="pq-eyebrow mb-4">Lines / {business.name}</div>
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
+            <div className="pq-eyebrow mb-4 truncate">Lines / {business.name}</div>
             <h1
+              className="break-words"
               style={{
-                fontSize: 44,
+                fontSize: 'clamp(32px, 8vw, 44px)',
                 fontWeight: 600,
                 letterSpacing: '-0.03em',
                 color: 'var(--pq-ink-0)',
@@ -59,9 +60,9 @@ export default async function BusinessLinesPage({
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 relative pb-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative pb-24">
         {lines.length === 0 ? (
-          <div className="pq-card p-12 text-center mt-8">
+          <div className="pq-card p-6 sm:p-10 md:p-12 text-center mt-8">
             <div className="pq-eyebrow mb-4" style={{ justifyContent: 'center' }}>
               Empty
             </div>
