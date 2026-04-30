@@ -182,8 +182,8 @@ export default function Navlinks({ user, variant = 'desktop' }: NavlinksProps) {
 
           <nav className="flex flex-col gap-1">
             <Link
-              href="/"
-              className={`${s.link} ${isActive('/') ? s.linkActive : ''}`}
+              href="/pricing"
+              className={`${s.link} ${isActive('/pricing') ? s.linkActive : ''}`}
               style={{ padding: '10px 12px', fontSize: 15 }}
             >
               Pricing
@@ -253,8 +253,8 @@ export default function Navlinks({ user, variant = 'desktop' }: NavlinksProps) {
         </Link>
         <nav className="ml-8 flex items-center gap-1">
           <Link
-            href="/"
-            className={`${s.link} ${isActive('/') ? s.linkActive : ''}`}
+            href="/pricing"
+            className={`${s.link} ${isActive('/pricing') ? s.linkActive : ''}`}
           >
             Pricing
           </Link>
