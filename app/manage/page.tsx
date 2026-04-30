@@ -90,19 +90,19 @@ export default async function ManageLinesPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid gap-4 mt-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 mt-8 grid-cols-2">
             {lines.map((line: any, idx: number) => (
               <Link
                 key={line.id}
                 href={`/manage/${line.id}`}
-                className="pq-card pq-card-hover p-5 flex flex-col group"
+                className="pq-card pq-card-hover p-7 sm:p-8 flex flex-col group aspect-[3/2]"
               >
                 <div className="flex items-center justify-between">
                   <div
                     className="pq-mono"
                     style={{
                       color: 'var(--pq-ink-3)',
-                      fontSize: 10.5,
+                      fontSize: 11.5,
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase'
                     }}
@@ -116,9 +116,9 @@ export default async function ManageLinesPage() {
                   )}
                 </div>
                 <h3
-                  className="mt-4"
+                  className="mt-5"
                   style={{
-                    fontSize: 20,
+                    fontSize: 26,
                     fontWeight: 600,
                     color: 'var(--pq-ink-0)',
                     letterSpacing: '-0.015em'
@@ -126,8 +126,8 @@ export default async function ManageLinesPage() {
                 >
                   {line.name || `Line ${line.id?.slice(0, 8) || 'N/A'}`}
                 </h3>
-                <div className="pq-divider my-4" />
-                <div className="flex items-end justify-between">
+                <div className="pq-divider my-5" />
+                <div className="flex items-end justify-between mt-auto">
                   <div>
                     <div
                       className="pq-label"
@@ -138,7 +138,7 @@ export default async function ManageLinesPage() {
                     <div
                       className="pq-ticket-number"
                       style={{
-                        fontSize: 32,
+                        fontSize: 44,
                         color:
                           line.position > 0
                             ? 'var(--pq-accent)'
@@ -154,7 +154,7 @@ export default async function ManageLinesPage() {
                     className="pq-mono"
                     style={{
                       color: 'var(--pq-ink-3)',
-                      fontSize: 10.5,
+                      fontSize: 11.5,
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase'
                     }}
