@@ -257,7 +257,11 @@ export default async function LineManagementPage({
               </dl>
               <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--pq-line)' }}>
                 <ServeTimeStats
-                  calledAt={(currentPosition as any)?.called_at ?? null}
+                  calledAt={
+                    (lineData as any).paused
+                      ? null
+                      : ((currentPosition as any)?.called_at ?? null)
+                  }
                   avgSeconds={
                     (lineData as any).avg_serve_seconds != null
                       ? Number((lineData as any).avg_serve_seconds)
