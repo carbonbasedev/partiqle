@@ -1,7 +1,10 @@
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getLineById } from '@/utils/supabase/queries';
 import PublicJoinLineForm from '@/components/ui/LineForms/PublicJoinLineForm';
+import ShareLineButton from '@/components/ui/LineForms/ShareLineButton';
+import { getURL } from 'utils/helpers';
 
 export default async function PublicJoinLinePage({
   params
@@ -18,6 +21,8 @@ export default async function PublicJoinLinePage({
   }
 
   const isPaused = Boolean((line as any).paused);
+  const host = (await headers()).get('host') ?? undefined;
+  const shareUrl = getURL(`/lines/${lineId}/join`, host);
 
   return (
     <section
@@ -83,6 +88,9 @@ export default async function PublicJoinLinePage({
             <PublicJoinLineForm lineId={lineId} />
           </div>
         )}
+        <div className="mt-4">
+          <ShareLineButton lineName={line.name} url={shareUrl} />
+        </div>
       </div>
     </section>
   );
