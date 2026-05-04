@@ -8,12 +8,26 @@ interface QueuePosition {
 export default function QueueVisual({
   positions,
   nowServing,
-  servingPosition
+  servingPosition,
+  size = 'default'
 }: {
   positions: QueuePosition[];
   nowServing: number | null | undefined;
   servingPosition?: QueuePosition | null;
+  size?: 'default' | 'large';
 }) {
+  const isLarge = size === 'large';
+  const servingDot = isLarge ? 32 : 16;
+  const dot = isLarge ? 22 : 10;
+  const lineThickness = isLarge ? 3 : 1;
+  const lineTop = isLarge ? 24 : 14;
+  const dotMarginTop = isLarge ? 14 : 9;
+  const servingMarginTop = isLarge ? 9 : 6;
+  const itemMinWidth = isLarge ? 88 : 44;
+  const numberFontSize = isLarge ? 14 : 10;
+  const nameFontSize = isLarge ? 16 : 11;
+  const nameMaxWidth = isLarge ? 120 : 64;
+  const itemGap = isLarge ? 28 : 16;
   const waiting = positions
     .filter((p) => p.status === 'waiting')
     .sort((a, b) => Number(a.position) - Number(b.position));
@@ -48,26 +62,29 @@ export default function QueueVisual({
           position: 'absolute',
           left: 8,
           right: 8,
-          top: 14,
-          height: 1,
+          top: lineTop,
+          height: lineThickness,
           background:
             'linear-gradient(90deg, oklch(0.88 0.19 125 / 0.6), rgba(255,255,255,0.05))'
         }}
       />
-      <div className="relative flex items-start gap-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+      <div
+        className="relative flex items-start overflow-x-auto pb-2"
+        style={{ scrollbarWidth: 'thin', gap: itemGap }}
+      >
         {servingPosition && (
           <div
             key={`serving-${servingPosition.id}`}
             className="flex flex-col items-center shrink-0"
-            style={{ minWidth: 44 }}
+            style={{ minWidth: itemMinWidth }}
             title={`Now serving · #${servingPosition.position} · ${servingPosition.name}`}
           >
             <div
               style={{
-                width: 16,
-                height: 16,
+                width: servingDot,
+                height: servingDot,
                 borderRadius: 999,
-                marginTop: 6,
+                marginTop: servingMarginTop,
                 background: 'oklch(0.88 0.19 125)',
                 boxShadow: '0 0 18px oklch(0.88 0.19 125 / 0.55)',
                 border: '2px solid oklch(0.88 0.19 125 / 0.4)'
@@ -76,7 +93,7 @@ export default function QueueVisual({
             <div
               className="pq-mono mt-2"
               style={{
-                fontSize: 10,
+                fontSize: numberFontSize,
                 letterSpacing: '0.14em',
                 color: 'var(--pq-accent)'
               }}
@@ -86,9 +103,9 @@ export default function QueueVisual({
             <div
               className="mt-1 text-center"
               style={{
-                fontSize: 11,
+                fontSize: nameFontSize,
                 color: 'var(--pq-ink-1)',
-                maxWidth: 64,
+                maxWidth: nameMaxWidth,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
@@ -102,22 +119,22 @@ export default function QueueVisual({
           <div
             key={p.id}
             className="flex flex-col items-center shrink-0"
-            style={{ minWidth: 44 }}
+            style={{ minWidth: itemMinWidth }}
             title={`#${p.position} · ${p.name}`}
           >
             <div
               style={{
-                width: 10,
-                height: 10,
+                width: dot,
+                height: dot,
                 borderRadius: 999,
-                marginTop: 9,
+                marginTop: dotMarginTop,
                 background: 'rgba(255,255,255,0.55)'
               }}
             />
             <div
               className="pq-mono mt-2"
               style={{
-                fontSize: 10,
+                fontSize: numberFontSize,
                 letterSpacing: '0.14em',
                 color: 'var(--pq-ink-3)'
               }}
@@ -127,9 +144,9 @@ export default function QueueVisual({
             <div
               className="mt-1 text-center"
               style={{
-                fontSize: 11,
+                fontSize: nameFontSize,
                 color: 'var(--pq-ink-2)',
-                maxWidth: 64,
+                maxWidth: nameMaxWidth,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
@@ -143,18 +160,18 @@ export default function QueueVisual({
           <div
             className="flex flex-col items-center shrink-0 pq-mono"
             style={{
-              minWidth: 44,
-              fontSize: 11,
+              minWidth: itemMinWidth,
+              fontSize: nameFontSize,
               color: 'var(--pq-ink-3)',
               letterSpacing: '0.14em'
             }}
           >
             <div
               style={{
-                width: 10,
-                height: 10,
+                width: dot,
+                height: dot,
                 borderRadius: 999,
-                marginTop: 9,
+                marginTop: dotMarginTop,
                 background: 'rgba(255,255,255,0.2)'
               }}
             />

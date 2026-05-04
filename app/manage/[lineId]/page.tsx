@@ -123,8 +123,12 @@ export default async function LineManagementPage({
 
       {/* Live queue — full-width visual */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative mb-6">
-        <div
-          className="pq-card relative overflow-hidden p-4 sm:p-6"
+        <Link
+          href={`/manage/${lineId}/queue`}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Open fullscreen queue in new tab"
+          className="pq-card pq-card-hover relative overflow-hidden p-4 sm:p-6 block"
           style={{
             background:
               'linear-gradient(180deg, var(--pq-surface-1) 0%, var(--pq-surface-0) 100%)'
@@ -165,7 +169,7 @@ export default async function LineManagementPage({
               servingPosition={(currentPosition as any) ?? null}
             />
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Now-serving ticket display */}
@@ -454,8 +458,11 @@ export default async function LineManagementPage({
               <p style={{ color: 'var(--pq-ink-2)', fontSize: 13.5, lineHeight: 1.55, marginBottom: 20 }}>
                 Display this QR at your location. Scanning opens a simple form to join.
               </p>
-              <div
-                className="flex justify-center p-4 rounded-xl"
+              <Link
+                href={`/manage/${lineId}/qr`}
+                target="_blank"
+                className="flex justify-center p-4 rounded-xl pq-card-hover"
+                title="Open fullscreen display"
                 style={{
                   background: 'var(--pq-surface-0)',
                   border: '1px solid var(--pq-line)'
@@ -463,11 +470,11 @@ export default async function LineManagementPage({
               >
                 <img
                   src={qrImageSrc}
-                  alt="QR code to join this line"
+                  alt="QR code to join this line — click to open fullscreen display"
                   className="w-40 h-40 sm:w-48 sm:h-48"
                   style={{ borderRadius: 8 }}
                 />
-              </div>
+              </Link>
               <div className="mt-4 min-w-0">
                 <div className="pq-label" style={{ marginBottom: 6 }}>Direct URL</div>
                 <Link
@@ -484,13 +491,6 @@ export default async function LineManagementPage({
                   {publicJoinUrl}
                 </Link>
               </div>
-              <Link
-                href={`/manage/${lineId}/qr`}
-                target="_blank"
-                className="pq-btn pq-btn-ghost mt-4 w-full justify-center"
-              >
-                Open fullscreen display →
-              </Link>
             </div>
           </div>
         </div>

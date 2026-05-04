@@ -60,21 +60,10 @@ export default async function LineQRDisplayPage({
       </div>
 
       <div className="flex flex-col items-center text-center w-full mt-8">
-        <div className="pq-eyebrow mb-4" style={{ justifyContent: 'center' }}>
+        <div className="pq-eyebrow" style={{ justifyContent: 'center' }}>
           <span className="pq-dot" />
-          Scan to join the line
+          Scan to join · {lineData.name}
         </div>
-        <h1
-          style={{
-            fontSize: 'clamp(40px, 7vw, 104px)',
-            fontWeight: 600,
-            letterSpacing: '-0.03em',
-            color: 'var(--pq-ink-0)',
-            lineHeight: 1.02
-          }}
-        >
-          {lineData.name}
-        </h1>
       </div>
 
       <div
