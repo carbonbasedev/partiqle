@@ -3,6 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { getLineWithPositions } from '@/utils/supabase/queries';
 import TicketAlert from '@/components/TicketAlert';
 import LeaveLineButton from '@/components/ui/LineForms/LeaveLineButton';
+import EstimatedWaitTimer from '@/components/ui/LineForms/EstimatedWaitTimer';
 
 export default async function PublicPositionPage({
   params
@@ -200,6 +201,18 @@ export default async function PublicPositionPage({
             </div>
           ) : null}
         </div>
+
+        {/* Estimated wait countdown — only shown while waiting */}
+        {!isCalled && !isSkipped && (
+          <EstimatedWaitTimer
+            avgSeconds={
+              (lineData as any).avg_serve_seconds != null
+                ? Number((lineData as any).avg_serve_seconds)
+                : null
+            }
+            peopleAhead={peopleAhead}
+          />
+        )}
 
         {/* Queue visual — only shown while waiting */}
         {!isCalled && !isSkipped && (
