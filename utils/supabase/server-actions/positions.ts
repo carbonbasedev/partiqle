@@ -156,6 +156,63 @@ export async function skipPosition(formData: FormData) {
   );
 }
 
+const TEST_FIRST_NAMES = [
+  'Ava', 'Noah', 'Mia', 'Liam', 'Zoe', 'Ethan', 'Luna', 'Mason',
+  'Iris', 'Owen', 'Maya', 'Leo', 'Nora', 'Eli', 'Cora', 'Finn',
+  'Ruby', 'Jude', 'Hazel', 'Theo'
+];
+const TEST_LAST_NAMES = [
+  'Patel', 'Nguyen', 'Garcia', 'Kim', 'Silva', 'Khan', 'Rossi',
+  'Müller', 'Costa', 'Brown', 'Jones', 'Yamada', 'Dubois', 'Andersen'
+];
+
+function randomTestName() {
+  const first =
+    TEST_FIRST_NAMES[Math.floor(Math.random() * TEST_FIRST_NAMES.length)];
+  const last =
+    TEST_LAST_NAMES[Math.floor(Math.random() * TEST_LAST_NAMES.length)];
+  return `${first} ${last}`;
+}
+
+function randomTestPhone() {
+  const part = () => String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+  return `+1 555 ${part().slice(0, 3)}-${part()}`;
+}
+
+export async function addTestCustomers(formData: FormData) {
+  const lineId = String(formData.get('lineId')).trim();
+  const count = 10;
+
+  const supabase = await createClient();
+
+  const { data: lastPositionRaw } = await supabase
+    .from('positions')
+    .select('position')
+    .eq('line_id', lineId)
+    .order('position', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const lastPosition =
+    (lastPositionRaw as { position: number | null } | null)?.position ?? 0;
+
+  const rows = Array.from({ length: count }, (_, i) => ({
+    name: randomTestName(),
+    phone: randomTestPhone(),
+    line_id: lineId,
+    position: Number(lastPosition) + i + 1,
+    status: 'waiting'
+  }));
+
+  await supabase.from('positions').insert(rows as any);
+
+  return getStatusRedirect(
+    `/manage/${lineId}`,
+    'Test customers added',
+    `${count} test customers were added to the queue.`
+  );
+}
+
 export async function leaveLine(formData: FormData) {
   const positionId = String(formData.get('positionId')).trim();
   const lineId = String(formData.get('lineId')).trim();

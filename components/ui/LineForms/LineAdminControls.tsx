@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { togglePaused, resetLine } from '@/utils/supabase/server-actions/lines';
+import { addTestCustomers } from '@/utils/supabase/server-actions/positions';
 import { handleRequest } from '@/utils/supabase/auth-helpers/client';
 
 export default function LineAdminControls({
@@ -17,11 +18,17 @@ export default function LineAdminControls({
 }) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
-  const [busy, setBusy] = useState<'pause' | 'reset' | null>(null);
+  const [busy, setBusy] = useState<'pause' | 'reset' | 'test' | null>(null);
 
   const onTogglePaused = async (e: React.FormEvent<HTMLFormElement>) => {
     setBusy('pause');
     await handleRequest(e, togglePaused, router);
+    setBusy(null);
+  };
+
+  const onAddTest = async (e: React.FormEvent<HTMLFormElement>) => {
+    setBusy('test');
+    await handleRequest(e, addTestCustomers, router);
     setBusy(null);
   };
 
@@ -40,6 +47,14 @@ export default function LineAdminControls({
         <input type="hidden" name="paused" value={String(paused)} />
         <Button variant="slim" type="submit" loading={busy === 'pause'}>
           {paused ? '▶  Resume line' : '❚❚  Pause line'}
+        </Button>
+      </form>
+
+      <form onSubmit={onAddTest}>
+        <input type="hidden" name="lineId" value={lineId} />
+        <input type="hidden" name="businessId" value={businessId} />
+        <Button variant="slim" type="submit" loading={busy === 'test'}>
+          {busy === 'test' ? 'Adding…' : '+ Add test customers'}
         </Button>
       </form>
 
