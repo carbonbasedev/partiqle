@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getLineWithPositions } from '@/utils/supabase/queries';
 import TicketAlert from '@/components/TicketAlert';
+import LeaveLineButton from '@/components/ui/LineForms/LeaveLineButton';
 
 export default async function PublicPositionPage({
   params
@@ -255,6 +256,15 @@ export default async function PublicPositionPage({
           lineId={lineId}
           initialStatus={String(position.status)}
         />
+
+        {!isCalled && !isSkipped && (
+          <div className="pq-card p-4 sm:p-5">
+            <LeaveLineButton
+              positionId={String(positionId)}
+              lineId={lineId}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

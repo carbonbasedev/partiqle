@@ -156,6 +156,50 @@ export async function skipPosition(formData: FormData) {
   );
 }
 
+export async function leaveLine(formData: FormData) {
+  const positionId = String(formData.get('positionId')).trim();
+  const lineId = String(formData.get('lineId')).trim();
+
+  const supabase = await createClient();
+
+  const { data: positionRow } = await supabase
+    .from('positions')
+    .select('status')
+    .eq('id', positionId)
+    .maybeSingle();
+
+  const status = (positionRow as { status: string } | null)?.status;
+
+  if (status !== 'waiting') {
+    return getErrorRedirect(
+      `/lines/${lineId}/positions/${positionId}`,
+      'Cannot leave',
+      'This ticket is no longer waiting in the queue.'
+    );
+  }
+
+  await supabase.from('positions').delete().eq('id', positionId);
+
+  // Touch the line row so subscribers (filtered by line_id) get a realtime
+  // event. The DELETE on positions can't be filtered server-side without
+  // REPLICA IDENTITY FULL, so we piggy-back on the lines table subscription.
+  const { data: lineRow } = await supabase
+    .from('lines')
+    .select('position')
+    .eq('id', lineId)
+    .maybeSingle();
+  await supabase
+    .from('lines')
+    .update({ position: (lineRow as { position: number | null } | null)?.position ?? null } as never)
+    .eq('id', lineId);
+
+  return getStatusRedirect(
+    `/lines/${lineId}/join`,
+    'You left the line.',
+    'Your spot has been removed from the queue.'
+  );
+}
+
 export async function callNextPosition(formData: FormData) {
   const lineId = String(formData.get('lineId')).trim();
   const businessId = String(formData.get('businessId')).trim();
