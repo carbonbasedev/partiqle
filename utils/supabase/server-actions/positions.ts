@@ -100,6 +100,44 @@ export async function joinLinePublic(formData: FormData) {
   );
 }
 
+async function closeOpenServeAndRecomputeAvg(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  lineId: string
+) {
+  const now = new Date().toISOString();
+
+  // Stamp served_at on any currently-called position that hasn't been closed yet.
+  await supabase
+    .from('positions')
+    .update({ served_at: now } as never)
+    .eq('line_id', lineId)
+    .eq('status', 'called')
+    .is('served_at', null);
+
+  // Recompute the line's average from every closed serve sample.
+  const { data: rows } = await supabase
+    .from('positions')
+    .select('called_at, served_at')
+    .eq('line_id', lineId)
+    .not('called_at', 'is', null)
+    .not('served_at', 'is', null);
+
+  const samples =
+    (rows as { called_at: string; served_at: string }[] | null) ?? [];
+  const totalSeconds = samples.reduce((acc, r) => {
+    const dt =
+      (new Date(r.served_at).getTime() - new Date(r.called_at).getTime()) /
+      1000;
+    return acc + (Number.isFinite(dt) && dt >= 0 ? dt : 0);
+  }, 0);
+  const avg = samples.length > 0 ? totalSeconds / samples.length : null;
+
+  await supabase
+    .from('lines')
+    .update({ avg_serve_seconds: avg } as never)
+    .eq('id', lineId);
+}
+
 export async function callPosition(formData: FormData) {
   const positionId = String(formData.get('positionId')).trim();
   const lineId = String(formData.get('lineId')).trim();
@@ -112,13 +150,20 @@ export async function callPosition(formData: FormData) {
   .select('*')
   .eq('id', positionId)
   .single();
-  
+
   const positionData = position as Database['public']['Tables']['positions']['Row'] | null;
-  
-  // Update position status to 'called'
+
+  // Close the previously called position (if any) and recompute the line's average.
+  await closeOpenServeAndRecomputeAvg(supabase, lineId);
+
+  // Update position status to 'called' and stamp called_at
   await supabase
     .from('positions')
-    .update({ status: 'called'} as never)
+    .update({
+      status: 'called',
+      called_at: new Date().toISOString(),
+      served_at: null
+    } as never)
     .eq('id', positionId);
 
   // Update line's current position
@@ -275,11 +320,20 @@ export async function callNextPosition(formData: FormData) {
 
   const nextPositionData = nextPosition as Database['public']['Tables']['positions']['Row'] | null;
 
-  // Mark this position as called
-  await supabase
-    .from('positions')
-    .update({ status: 'called' } as never)
-    .eq('id', nextPositionData?.id ?? '0');
+  // Close the previously called position (if any) and recompute the line's average.
+  await closeOpenServeAndRecomputeAvg(supabase, lineId);
+
+  // Mark this position as called and stamp called_at
+  if (nextPositionData?.id) {
+    await supabase
+      .from('positions')
+      .update({
+        status: 'called',
+        called_at: new Date().toISOString(),
+        served_at: null
+      } as never)
+      .eq('id', nextPositionData.id);
+  }
 
   // Update the line's current position
   await supabase

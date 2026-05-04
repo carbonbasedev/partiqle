@@ -52,11 +52,11 @@ export async function resetLine(formData: FormData) {
 
   const supabase = await createClient();
 
-  // Delete every position for this line, then reset the served counter.
+  // Delete every position for this line, then reset the served counter and average.
   await supabase.from('positions').delete().eq('line_id', lineId);
   await supabase
     .from('lines')
-    .update({ position: 0 } as never)
+    .update({ position: 0, avg_serve_seconds: null } as never)
     .eq('id', lineId);
 
   return getStatusRedirect(

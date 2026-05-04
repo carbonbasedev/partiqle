@@ -10,6 +10,7 @@ import { getURL } from 'utils/helpers';
 import RealtimeRefresh from '@/components/RealtimeRefresh';
 import QueueVisual from '@/components/ui/LineForms/QueueVisual';
 import LineAdminControls from '@/components/ui/LineForms/LineAdminControls';
+import ServeTimeStats from '@/components/ui/LineForms/ServeTimeStats';
 
 export default async function LineManagementPage({
   params
@@ -68,7 +69,6 @@ export default async function LineManagementPage({
     pastCalledPositions.length > 0 ? pastCalledPositions[0] : null;
 
   const fmtNum = (n: number | null | undefined) => String(n ?? 0).padStart(3, '0');
-  const totalServed = pastCalledPositions.filter((p: any) => p.status === 'called').length;
 
   return (
     <section className="relative">
@@ -244,22 +244,6 @@ export default async function LineManagementPage({
             >
               <div className="pq-label mb-3">Session stats</div>
               <dl className="grid grid-cols-2 md:grid-cols-1 gap-4 md:gap-5">
-                <div>
-                  <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
-                    Waiting
-                  </dt>
-                  <dd className="pq-ticket-number" style={{ fontSize: 32, color: 'var(--pq-ink-0)' }}>
-                    {fmtNum(waitingPositions.length)}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
-                    Served
-                  </dt>
-                  <dd className="pq-ticket-number" style={{ fontSize: 32, color: 'var(--pq-ink-1)' }}>
-                    {fmtNum(totalServed)}
-                  </dd>
-                </div>
                 {lastCalledPosition && (
                   <div className="col-span-2 md:col-span-1 min-w-0">
                     <dt className="pq-mono" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--pq-ink-3)' }}>
@@ -271,7 +255,17 @@ export default async function LineManagementPage({
                   </div>
                 )}
               </dl>
-              <div className="mt-7 pt-6" style={{ borderTop: '1px solid var(--pq-line)' }}>
+              <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--pq-line)' }}>
+                <ServeTimeStats
+                  calledAt={(currentPosition as any)?.called_at ?? null}
+                  avgSeconds={
+                    (lineData as any).avg_serve_seconds != null
+                      ? Number((lineData as any).avg_serve_seconds)
+                      : null
+                  }
+                />
+              </div>
+              <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--pq-line)' }}>
                 <NextInLineButton
                   businessId={id}
                   lineId={lineId}
