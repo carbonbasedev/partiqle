@@ -29,7 +29,9 @@ export default async function PublicPositionPage({
 
   const aheadList = (lineData.positions as any[])
     .filter(
-      (p) => p.status === 'waiting' && p.position < position.position
+      (p) =>
+        (p.status === 'waiting' || p.status === 'called') &&
+        p.position < position.position
     )
     .sort((a, b) => Number(a.position) - Number(b.position));
 
