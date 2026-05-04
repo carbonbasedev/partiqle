@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 function formatDuration(seconds: number | null | undefined) {
   if (seconds == null || !Number.isFinite(seconds) || seconds < 0) return '—';
@@ -22,17 +22,27 @@ export default function ServeTimeStats({
   calledAt: string | null;
   avgSeconds: number | null;
 }) {
+  // Anchor the timer at the moment the page renders (or a new turn starts),
+  // not at the DB called_at — closing/leaving the page or pausing the line
+  // resets the counter on the next visit / resume.
+  const startRef = useRef<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!calledAt) return;
+    if (!calledAt) {
+      startRef.current = null;
+      return;
+    }
+    startRef.current = Date.now();
+    setNow(Date.now());
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [calledAt]);
 
-  const elapsed = calledAt
-    ? Math.max(0, (now - new Date(calledAt).getTime()) / 1000)
-    : null;
+  const elapsed =
+    calledAt && startRef.current != null
+      ? Math.max(0, (now - startRef.current) / 1000)
+      : null;
 
   return (
     <div className="flex flex-col gap-4">
