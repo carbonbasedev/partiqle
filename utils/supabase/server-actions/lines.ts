@@ -46,6 +46,22 @@ export async function togglePaused(formData: FormData) {
   );
 }
 
+export async function deleteLine(formData: FormData) {
+  const lineId = String(formData.get('lineId')).trim();
+
+  const supabase = await createClient();
+
+  // positions has ON DELETE CASCADE on the line FK, so removing the line
+  // also removes its positions and any push subscriptions tied to them.
+  await supabase.from('lines').delete().eq('id', lineId);
+
+  return getStatusRedirect(
+    `/manage`,
+    'Line deleted.',
+    'The line and all related data were removed.'
+  );
+}
+
 export async function resetLine(formData: FormData) {
   const lineId = String(formData.get('lineId')).trim();
   const businessId = String(formData.get('businessId')).trim();
