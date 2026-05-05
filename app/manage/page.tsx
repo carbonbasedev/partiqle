@@ -7,6 +7,19 @@ import {
   getLinesByBusiness
 } from '@/utils/supabase/queries';
 
+function formatAvg(seconds: number | string | null | undefined) {
+  if (seconds == null) return '—';
+  const total = Math.max(0, Math.floor(Number(seconds)));
+  if (!Number.isFinite(total)) return '—';
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  if (m >= 60) {
+    const h = Math.floor(m / 60);
+    return `${h}h ${String(m % 60).padStart(2, '0')}m`;
+  }
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
 export default async function ManageLinesPage() {
   const supabase = await createClient();
   const user = await getUser(supabase);
@@ -90,12 +103,12 @@ export default async function ManageLinesPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid gap-6 mt-8 grid-cols-2">
+          <div className="grid gap-6 mt-8 grid-cols-1 sm:grid-cols-2">
             {lines.map((line: any, idx: number) => (
               <Link
                 key={line.id}
                 href={`/manage/${line.id}`}
-                className="pq-card pq-card-hover p-7 sm:p-8 flex flex-col group aspect-[3/2]"
+                className="pq-card pq-card-hover p-5 sm:p-8 flex flex-col group sm:aspect-[3/2]"
               >
                 <div className="flex items-center justify-between">
                   <div
@@ -127,8 +140,8 @@ export default async function ManageLinesPage() {
                   {line.name || `Line ${line.id?.slice(0, 8) || 'N/A'}`}
                 </h3>
                 <div className="pq-divider my-5" />
-                <div className="flex items-end justify-between mt-auto">
-                  <div>
+                <div className="flex items-end justify-between gap-4 mt-auto flex-wrap">
+                  <div className="min-w-0">
                     <div
                       className="pq-label"
                       style={{ marginBottom: 4 }}
@@ -138,7 +151,7 @@ export default async function ManageLinesPage() {
                     <div
                       className="pq-ticket-number"
                       style={{
-                        fontSize: 44,
+                        fontSize: 40,
                         color:
                           line.position > 0
                             ? 'var(--pq-accent)'
@@ -150,17 +163,26 @@ export default async function ManageLinesPage() {
                         : '—'}
                     </div>
                   </div>
-                  <div
-                    className="pq-mono"
-                    style={{
-                      color: 'var(--pq-ink-3)',
-                      fontSize: 11.5,
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase'
-                    }}
-                  >
-                    {line.created_at &&
-                      new Date(line.created_at).toLocaleDateString()}
+                  <div className="min-w-0 text-right">
+                    <div
+                      className="pq-label"
+                      style={{ marginBottom: 4 }}
+                    >
+                      Avg per turn
+                    </div>
+                    <div
+                      className="pq-ticket-number"
+                      style={{
+                        fontSize: 22,
+                        color:
+                          line.avg_serve_seconds != null
+                            ? 'var(--pq-ink-1)'
+                            : 'var(--pq-ink-3)',
+                        fontVariantNumeric: 'tabular-nums'
+                      }}
+                    >
+                      {formatAvg(line.avg_serve_seconds)}
+                    </div>
                   </div>
                 </div>
               </Link>
