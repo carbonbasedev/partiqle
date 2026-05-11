@@ -38,6 +38,11 @@ export default async function PublicPositionPage({
 
   const peopleAhead = aheadList.length;
 
+  const nowServingPosition =
+    (lineData.positions as any[]).find(
+      (p) => p.status === 'called' && p.served_at == null
+    )?.position ?? null;
+
   const isCalled = position.status === 'called';
   const isSkipped = position.status === 'skipped';
 
@@ -246,6 +251,7 @@ export default async function PublicPositionPage({
                 position: p.position
               }))}
               myPosition={position.position}
+              nowServingPosition={nowServingPosition}
             />
 
             <div
@@ -288,10 +294,12 @@ export default async function PublicPositionPage({
 
 function TicketQueueVisual({
   ahead,
-  myPosition
+  myPosition,
+  nowServingPosition
 }: {
   ahead: { id: string | number; position: number }[];
   myPosition: number;
+  nowServingPosition?: number | null;
 }) {
   const max = 24;
   const visible = ahead.slice(-max);
@@ -338,34 +346,55 @@ function TicketQueueVisual({
             <div className="mt-2">+{overflow}</div>
           </div>
         )}
-        {visible.map((p) => (
-          <div
-            key={p.id}
-            className="flex flex-col items-center shrink-0"
-            style={{ minWidth: 36 }}
-            title={`#${p.position}`}
-          >
+        {visible.map((p) => {
+          const isServing =
+            nowServingPosition != null && p.position === nowServingPosition;
+          return (
             <div
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: 999,
-                marginTop: 9,
-                background: 'rgba(255,255,255,0.45)'
-              }}
-            />
-            <div
-              className="pq-mono mt-2"
-              style={{
-                fontSize: 10,
-                letterSpacing: '0.12em',
-                color: 'var(--pq-ink-3)'
-              }}
+              key={p.id}
+              className="flex flex-col items-center shrink-0"
+              style={{ minWidth: 36 }}
+              title={
+                isServing ? `Now serving · #${p.position}` : `#${p.position}`
+              }
             >
-              {fmt(p.position)}
+              <div
+                style={
+                  isServing
+                    ? {
+                        width: 14,
+                        height: 14,
+                        borderRadius: 999,
+                        marginTop: 7,
+                        background: 'oklch(0.88 0.19 125)',
+                        boxShadow: '0 0 14px oklch(0.88 0.19 125 / 0.55)',
+                        border: '2px solid oklch(0.88 0.19 125 / 0.4)'
+                      }
+                    : {
+                        width: 10,
+                        height: 10,
+                        borderRadius: 999,
+                        marginTop: 9,
+                        background: 'rgba(255,255,255,0.45)'
+                      }
+                }
+              />
+              <div
+                className="pq-mono mt-2"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.12em',
+                  color: isServing
+                    ? 'var(--pq-accent)'
+                    : 'var(--pq-ink-3)',
+                  fontWeight: isServing ? 500 : 400
+                }}
+              >
+                {fmt(p.position)}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         {/* My ticket — accent dot */}
         <div
           className="flex flex-col items-center shrink-0"
