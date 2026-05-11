@@ -43,8 +43,14 @@ export default function RealtimeRefresh({ lineId }: { lineId: string }) {
       )
       .subscribe();
 
+    const pollInterval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
+      router.refresh();
+    }, 5000);
+
     return () => {
       if (pending) clearTimeout(pending);
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, [lineId, router]);
